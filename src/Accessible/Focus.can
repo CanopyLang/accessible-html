@@ -1,0 +1,114 @@
+module Accessible.Focus exposing
+    ( FocusTarget(..), FocusTrap
+    , focusOn
+    , skipNav, focusTrap
+    )
+
+{-| Focus management utilities for accessible web applications.
+
+Focus management is critical for accessibility: when a modal opens, focus
+should move to it; when it closes, focus should return to the trigger.
+Skip navigation links let keyboard users bypass repetitive navigation.
+Focus traps keep Tab cycling within a modal or dialog.
+
+# Types
+@docs FocusTarget, FocusTrap
+
+# Focus Commands
+@docs focusOn
+
+# Widgets
+@docs skipNav, focusTrap
+-}
+
+import Browser.Dom
+import Html
+import Task
+import VirtualDom
+
+
+{-| Identifies a DOM element for focus management commands. -}
+type FocusTarget
+    = FocusById String
+    | FocusFirst String
+    | FocusLast String
+
+
+{-| A focus trap configuration for modal dialogs and similar patterns.
+Focus cycles within the container element.
+-}
+type alias FocusTrap =
+    { containerId : String
+    , initialFocusId : Maybe String
+    , returnFocusId : String
+    }
+
+
+{-| Move focus to the element with the given ID. Returns a Task that
+can fail if the element is not found. Use with Task.attempt in your
+update function.
+
+    type Msg
+        = FocusResult (Result Browser.Dom.Error ())
+
+    focusSearchBox : Cmd Msg
+    focusSearchBox =
+        Task.attempt FocusResult (Accessible.Focus.focusOn "search-box")
+-}
+focusOn : String -> Task.Task Browser.Dom.Error ()
+focusOn =
+    Browser.Dom.focus
+
+
+{-| Create a skip navigation link. Renders a link that is visually hidden
+until focused, then becomes visible. Clicking it moves focus to the
+target element.
+
+    Accessible.Focus.skipNav "Skip to main content" "main-content"
+-}
+skipNav : String -> String -> Html.Html msg
+skipNav linkText targetId =
+    VirtualDom.node "a"
+        [ VirtualDom.attribute "href" ("#" ++ targetId)
+        , VirtualDom.attribute "class" "skip-nav"
+        , VirtualDom.style "position" "absolute"
+        , VirtualDom.style "left" "-10000px"
+        , VirtualDom.style "top" "auto"
+        , VirtualDom.style "width" "1px"
+        , VirtualDom.style "height" "1px"
+        , VirtualDom.style "overflow" "hidden"
+        , VirtualDom.style "z-index" "999"
+        ]
+        [ VirtualDom.text linkText ]
+
+
+{-| Attributes for creating a focus trap. Apply to the container element.
+Focus will cycle within this container when tabbing. Used for modals.
+
+The focus trap is implemented with data attributes that can be used by
+JavaScript to set up the actual trapping behavior. The containerId is
+set as the element's id, and the trap metadata is stored in data attributes.
+
+    div (Accessible.Focus.focusTrap
+            { containerId = "modal"
+            , initialFocusId = Just "first-input"
+            , returnFocusId = "trigger-button"
+            })
+        [ ... ]
+-}
+focusTrap : FocusTrap -> List (Html.Attribute msg)
+focusTrap config =
+    let
+        initialFocusAttr =
+            case config.initialFocusId of
+                Just focusId ->
+                    [ VirtualDom.attribute "data-focus-initial" focusId ]
+
+                Nothing ->
+                    []
+    in
+    [ VirtualDom.attribute "id" config.containerId
+    , VirtualDom.attribute "data-focus-trap" "true"
+    , VirtualDom.attribute "data-focus-return" config.returnFocusId
+    ]
+        ++ initialFocusAttr

@@ -1,0 +1,524 @@
+module Accessible.Role exposing
+    ( Role(..)
+    , role, roleToString, custom
+    , alert, alertDialog, application, article
+    , button, checkBox, code, columnHeader, comboBox, comment
+    , definition, deletion, dialog, directory, document
+    , emphasis
+    , feed, figure, grid, gridCell, group
+    , heading
+    , img, insertion
+    , link, list, listBox, listItem, log
+    , mark, marquee, math, menu, menuBar, menuItem
+    , menuItemCheckBox, menuItemRadio, meter
+    , none, note
+    , option
+    , presentation, progressBar
+    , radio, radioGroup, row, rowGroup, rowHeader
+    , scrollBar, separator, slider, spinButton, status
+    , strong, subscript, suggestion, superscript, switch
+    , tab, tabList, tabPanel, textBox, time, timer
+    , toolBar, toolTip, tree, treeGrid, treeItem
+    )
+
+{-| All WAI-ARIA roles as a closed union type and attribute helpers.
+Prevents typos and provides exhaustive documentation of available roles.
+
+# Type
+@docs Role
+
+# Core
+@docs role, roleToString, custom
+
+# Widget Roles
+@docs alert, alertDialog, button, checkBox, comboBox, dialog
+@docs gridCell, link, log, marquee, menu, menuBar, menuItem
+@docs menuItemCheckBox, menuItemRadio, option, progressBar
+@docs radio, radioGroup, scrollBar, separator, slider, spinButton
+@docs status, switch, tab, tabList, tabPanel, textBox, timer
+@docs toolBar, toolTip, tree, treeGrid, treeItem
+
+# Document Structure Roles
+@docs application, article, code, columnHeader, definition, directory
+@docs document, feed, figure, grid, group, heading, img, list, listBox
+@docs listItem, math, meter, none, note, presentation, row, rowGroup
+@docs rowHeader
+
+# Annotation Roles
+@docs comment, deletion, emphasis, insertion, mark, strong
+@docs subscript, suggestion, superscript
+
+-}
+
+import Html
+import VirtualDom
+
+
+{-| All WAI-ARIA roles as a closed union type. Prevents typos and provides
+exhaustive documentation of available roles.
+-}
+type Role
+    = Alert
+    | AlertDialog
+    | Button
+    | CheckBox
+    | ComboBox
+    | Dialog
+    | GridCell
+    | Link
+    | Log
+    | Marquee
+    | Menu
+    | MenuBar
+    | MenuItem
+    | MenuItemCheckBox
+    | MenuItemRadio
+    | Option
+    | ProgressBar
+    | Radio
+    | RadioGroup
+    | ScrollBar
+    | Separator
+    | Slider
+    | SpinButton
+    | Status
+    | Switch
+    | Tab
+    | TabList
+    | TabPanel
+    | TextBox
+    | Timer
+    | ToolBar
+    | ToolTip
+    | Tree
+    | TreeGrid
+    | TreeItem
+    | Application
+    | Article
+    | Code
+    | ColumnHeader
+    | Definition
+    | Directory
+    | Document
+    | Feed
+    | Figure
+    | Grid
+    | Group
+    | Heading
+    | Img
+    | List
+    | ListBox
+    | ListItem
+    | Math
+    | Meter
+    | None
+    | Note
+    | Presentation
+    | Row
+    | RowGroup
+    | RowHeader
+    | Table
+    | Term
+    | Time
+    | Banner
+    | Complementary
+    | ContentInfo
+    | Form
+    | Main
+    | Navigation
+    | Region
+    | Search
+    | Comment
+    | Deletion
+    | Emphasis
+    | Insertion
+    | Mark
+    | Strong
+    | Subscript
+    | Suggestion
+    | Superscript
+
+
+{-| Set the role attribute to a typed Role value. Compiles to the correct
+ARIA role string.
+
+    div [ Accessible.Role.role Accessible.Role.Alert ] [ text "Error occurred" ]
+-}
+role : Role -> Html.Attribute msg
+role r =
+    VirtualDom.attribute "role" (roleToString r)
+
+
+{-| Render a Role to its WAI-ARIA string representation.
+E.g., AlertDialog -> "alertdialog", MenuItemCheckBox -> "menuitemcheckbox"
+-}
+roleToString : Role -> String
+roleToString r =
+    case r of
+        Alert -> "alert"
+        AlertDialog -> "alertdialog"
+        Button -> "button"
+        CheckBox -> "checkbox"
+        ComboBox -> "combobox"
+        Dialog -> "dialog"
+        GridCell -> "gridcell"
+        Link -> "link"
+        Log -> "log"
+        Marquee -> "marquee"
+        Menu -> "menu"
+        MenuBar -> "menubar"
+        MenuItem -> "menuitem"
+        MenuItemCheckBox -> "menuitemcheckbox"
+        MenuItemRadio -> "menuitemradio"
+        Option -> "option"
+        ProgressBar -> "progressbar"
+        Radio -> "radio"
+        RadioGroup -> "radiogroup"
+        ScrollBar -> "scrollbar"
+        Separator -> "separator"
+        Slider -> "slider"
+        SpinButton -> "spinbutton"
+        Status -> "status"
+        Switch -> "switch"
+        Tab -> "tab"
+        TabList -> "tablist"
+        TabPanel -> "tabpanel"
+        TextBox -> "textbox"
+        Timer -> "timer"
+        ToolBar -> "toolbar"
+        ToolTip -> "tooltip"
+        Tree -> "tree"
+        TreeGrid -> "treegrid"
+        TreeItem -> "treeitem"
+        Application -> "application"
+        Article -> "article"
+        Code -> "code"
+        ColumnHeader -> "columnheader"
+        Definition -> "definition"
+        Directory -> "directory"
+        Document -> "document"
+        Feed -> "feed"
+        Figure -> "figure"
+        Grid -> "grid"
+        Group -> "group"
+        Heading -> "heading"
+        Img -> "img"
+        List -> "list"
+        ListBox -> "listbox"
+        ListItem -> "listitem"
+        Math -> "math"
+        Meter -> "meter"
+        None -> "none"
+        Note -> "note"
+        Presentation -> "presentation"
+        Row -> "row"
+        RowGroup -> "rowgroup"
+        RowHeader -> "rowheader"
+        Table -> "table"
+        Term -> "term"
+        Time -> "time"
+        Banner -> "banner"
+        Complementary -> "complementary"
+        ContentInfo -> "contentinfo"
+        Form -> "form"
+        Main -> "main"
+        Navigation -> "navigation"
+        Region -> "region"
+        Search -> "search"
+        Comment -> "comment"
+        Deletion -> "deletion"
+        Emphasis -> "emphasis"
+        Insertion -> "insertion"
+        Mark -> "mark"
+        Strong -> "strong"
+        Subscript -> "subscript"
+        Suggestion -> "suggestion"
+        Superscript -> "superscript"
+
+
+{-| Set role to a custom string. Escape hatch for roles not in the union type.
+Prefer the typed Role constructors when possible.
+-}
+custom : String -> Html.Attribute msg
+custom =
+    VirtualDom.attribute "role"
+
+
+-- CONVENIENCE FUNCTIONS
+
+
+{-| role="alert" -}
+alert : Html.Attribute msg
+alert = role Alert
+
+{-| role="alertdialog" -}
+alertDialog : Html.Attribute msg
+alertDialog = role AlertDialog
+
+{-| role="application" -}
+application : Html.Attribute msg
+application = role Application
+
+{-| role="article" -}
+article : Html.Attribute msg
+article = role Article
+
+{-| role="button" -}
+button : Html.Attribute msg
+button = role Button
+
+{-| role="checkbox" -}
+checkBox : Html.Attribute msg
+checkBox = role CheckBox
+
+{-| role="code" -}
+code : Html.Attribute msg
+code = role Code
+
+{-| role="columnheader" -}
+columnHeader : Html.Attribute msg
+columnHeader = role ColumnHeader
+
+{-| role="combobox" -}
+comboBox : Html.Attribute msg
+comboBox = role ComboBox
+
+{-| role="comment" -}
+comment : Html.Attribute msg
+comment = role Comment
+
+{-| role="definition" -}
+definition : Html.Attribute msg
+definition = role Definition
+
+{-| role="deletion" -}
+deletion : Html.Attribute msg
+deletion = role Deletion
+
+{-| role="dialog" -}
+dialog : Html.Attribute msg
+dialog = role Dialog
+
+{-| role="directory" -}
+directory : Html.Attribute msg
+directory = role Directory
+
+{-| role="document" -}
+document : Html.Attribute msg
+document = role Document
+
+{-| role="emphasis" -}
+emphasis : Html.Attribute msg
+emphasis = role Emphasis
+
+{-| role="feed" -}
+feed : Html.Attribute msg
+feed = role Feed
+
+{-| role="figure" -}
+figure : Html.Attribute msg
+figure = role Figure
+
+{-| role="grid" -}
+grid : Html.Attribute msg
+grid = role Grid
+
+{-| role="gridcell" -}
+gridCell : Html.Attribute msg
+gridCell = role GridCell
+
+{-| role="group" -}
+group : Html.Attribute msg
+group = role Group
+
+{-| role="heading" -}
+heading : Html.Attribute msg
+heading = role Heading
+
+{-| role="img" -}
+img : Html.Attribute msg
+img = role Img
+
+{-| role="insertion" -}
+insertion : Html.Attribute msg
+insertion = role Insertion
+
+{-| role="link" -}
+link : Html.Attribute msg
+link = role Link
+
+{-| role="list" -}
+list : Html.Attribute msg
+list = role List
+
+{-| role="listbox" -}
+listBox : Html.Attribute msg
+listBox = role ListBox
+
+{-| role="listitem" -}
+listItem : Html.Attribute msg
+listItem = role ListItem
+
+{-| role="log" -}
+log : Html.Attribute msg
+log = role Log
+
+{-| role="mark" -}
+mark : Html.Attribute msg
+mark = role Mark
+
+{-| role="marquee" -}
+marquee : Html.Attribute msg
+marquee = role Marquee
+
+{-| role="math" -}
+math : Html.Attribute msg
+math = role Math
+
+{-| role="menu" -}
+menu : Html.Attribute msg
+menu = role Menu
+
+{-| role="menubar" -}
+menuBar : Html.Attribute msg
+menuBar = role MenuBar
+
+{-| role="menuitem" -}
+menuItem : Html.Attribute msg
+menuItem = role MenuItem
+
+{-| role="menuitemcheckbox" -}
+menuItemCheckBox : Html.Attribute msg
+menuItemCheckBox = role MenuItemCheckBox
+
+{-| role="menuitemradio" -}
+menuItemRadio : Html.Attribute msg
+menuItemRadio = role MenuItemRadio
+
+{-| role="meter" -}
+meter : Html.Attribute msg
+meter = role Meter
+
+{-| role="none" -}
+none : Html.Attribute msg
+none = role None
+
+{-| role="note" -}
+note : Html.Attribute msg
+note = role Note
+
+{-| role="option" -}
+option : Html.Attribute msg
+option = role Option
+
+{-| role="presentation" -}
+presentation : Html.Attribute msg
+presentation = role Presentation
+
+{-| role="progressbar" -}
+progressBar : Html.Attribute msg
+progressBar = role ProgressBar
+
+{-| role="radio" -}
+radio : Html.Attribute msg
+radio = role Radio
+
+{-| role="radiogroup" -}
+radioGroup : Html.Attribute msg
+radioGroup = role RadioGroup
+
+{-| role="row" -}
+row : Html.Attribute msg
+row = role Row
+
+{-| role="rowgroup" -}
+rowGroup : Html.Attribute msg
+rowGroup = role RowGroup
+
+{-| role="rowheader" -}
+rowHeader : Html.Attribute msg
+rowHeader = role RowHeader
+
+{-| role="scrollbar" -}
+scrollBar : Html.Attribute msg
+scrollBar = role ScrollBar
+
+{-| role="separator" -}
+separator : Html.Attribute msg
+separator = role Separator
+
+{-| role="slider" -}
+slider : Html.Attribute msg
+slider = role Slider
+
+{-| role="spinbutton" -}
+spinButton : Html.Attribute msg
+spinButton = role SpinButton
+
+{-| role="status" -}
+status : Html.Attribute msg
+status = role Status
+
+{-| role="strong" -}
+strong : Html.Attribute msg
+strong = role Strong
+
+{-| role="subscript" -}
+subscript : Html.Attribute msg
+subscript = role Subscript
+
+{-| role="suggestion" -}
+suggestion : Html.Attribute msg
+suggestion = role Suggestion
+
+{-| role="superscript" -}
+superscript : Html.Attribute msg
+superscript = role Superscript
+
+{-| role="switch" -}
+switch : Html.Attribute msg
+switch = role Switch
+
+{-| role="tab" -}
+tab : Html.Attribute msg
+tab = role Tab
+
+{-| role="tablist" -}
+tabList : Html.Attribute msg
+tabList = role TabList
+
+{-| role="tabpanel" -}
+tabPanel : Html.Attribute msg
+tabPanel = role TabPanel
+
+{-| role="textbox" -}
+textBox : Html.Attribute msg
+textBox = role TextBox
+
+{-| role="time" -}
+time : Html.Attribute msg
+time = role Time
+
+{-| role="timer" -}
+timer : Html.Attribute msg
+timer = role Timer
+
+{-| role="toolbar" -}
+toolBar : Html.Attribute msg
+toolBar = role ToolBar
+
+{-| role="tooltip" -}
+toolTip : Html.Attribute msg
+toolTip = role ToolTip
+
+{-| role="tree" -}
+tree : Html.Attribute msg
+tree = role Tree
+
+{-| role="treegrid" -}
+treeGrid : Html.Attribute msg
+treeGrid = role TreeGrid
+
+{-| role="treeitem" -}
+treeItem : Html.Attribute msg
+treeItem = role TreeItem

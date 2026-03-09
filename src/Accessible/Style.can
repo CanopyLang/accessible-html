@@ -1,0 +1,29 @@
+module Accessible.Style exposing (invisible)
+
+{-| Screen-reader-only visibility helpers.
+
+@docs invisible
+-}
+
+import Html
+import VirtualDom
+
+
+{-| A list of HTML attributes that make an element visually invisible but
+still announced by screen readers. Apply to elements that should be
+"screen reader only."
+
+    span (Accessible.Style.invisible) [ text "Opens in a new tab" ]
+-}
+invisible : List (Html.Attribute msg)
+invisible =
+    [ VirtualDom.style "position" "absolute"
+    , VirtualDom.style "width" "1px"
+    , VirtualDom.style "height" "1px"
+    , VirtualDom.style "padding" "0"
+    , VirtualDom.style "margin" "-1px"
+    , VirtualDom.style "overflow" "hidden"
+    , VirtualDom.style "clip" "rect(0, 0, 0, 0)"
+    , VirtualDom.style "white-space" "nowrap"
+    , VirtualDom.style "border" "0"
+    ]

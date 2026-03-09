@@ -1,0 +1,15 @@
+module Test.Style exposing (main)
+
+import Accessible.Style as Style
+import Test exposing (Test, describe, test)
+import Expect
+
+
+main : Test
+main =
+    describe "Accessible.Style"
+        [ test "invisible returns a list of attributes" <| \_ ->
+            Expect.equal (List.length Style.invisible) 9
+        , test "invisible is non-empty" <| \_ ->
+            Expect.notEqual Style.invisible []
+        ]

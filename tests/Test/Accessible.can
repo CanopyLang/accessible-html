@@ -1,0 +1,676 @@
+module Test.Accessible exposing (main)
+
+import Accessible
+import Html.Attributes
+import Test exposing (Test, describe, test)
+import Expect
+
+
+main : Test
+main =
+    describe "Accessible"
+        [ textTests
+        , headingTests
+        , groupingTests
+        , textSemanticTests
+        , listTests
+        , sectionTests
+        , tableTests
+        , formTests
+        , mediaTests
+        , embeddedTests
+        , editTests
+        , interactiveTests
+        , imageTests
+        , inputTests
+        , buttonTests
+        , labelTests
+        , tabTests
+        ]
+
+
+textTests : Test
+textTests =
+    describe "text"
+        [ test "creates a text node" <| \_ ->
+            let
+                node = Accessible.text "hello"
+            in
+            Expect.pass
+        ]
+
+
+headingTests : Test
+headingTests =
+    describe "headings"
+        [ test "h1 creates heading" <| \_ ->
+            let
+                node = Accessible.h1 [] [ Accessible.text "Title" ]
+            in
+            Expect.pass
+        , test "h2 creates heading" <| \_ ->
+            let
+                node = Accessible.h2 [] [ Accessible.text "Subtitle" ]
+            in
+            Expect.pass
+        , test "h3 creates heading" <| \_ ->
+            let
+                node = Accessible.h3 [] [ Accessible.text "Section" ]
+            in
+            Expect.pass
+        , test "h4 creates heading" <| \_ ->
+            let
+                node = Accessible.h4 [] [ Accessible.text "Subsection" ]
+            in
+            Expect.pass
+        , test "h5 creates heading" <| \_ ->
+            let
+                node = Accessible.h5 [] [ Accessible.text "Detail" ]
+            in
+            Expect.pass
+        , test "h6 creates heading" <| \_ ->
+            let
+                node = Accessible.h6 [] [ Accessible.text "Fine detail" ]
+            in
+            Expect.pass
+        ]
+
+
+groupingTests : Test
+groupingTests =
+    describe "grouping content"
+        [ test "div creates container" <| \_ ->
+            let
+                node = Accessible.div [] [ Accessible.text "content" ]
+            in
+            Expect.pass
+        , test "p creates paragraph" <| \_ ->
+            let
+                node = Accessible.p [] [ Accessible.text "text" ]
+            in
+            Expect.pass
+        , test "hr creates horizontal rule" <| \_ ->
+            let
+                node = Accessible.hr [] []
+            in
+            Expect.pass
+        , test "pre creates preformatted text" <| \_ ->
+            let
+                node = Accessible.pre [] [ Accessible.text "code" ]
+            in
+            Expect.pass
+        , test "blockquote creates quotation" <| \_ ->
+            let
+                node = Accessible.blockquote [] [ Accessible.text "quote" ]
+            in
+            Expect.pass
+        ]
+
+
+textSemanticTests : Test
+textSemanticTests =
+    describe "text semantics"
+        [ test "span creates inline container" <| \_ ->
+            let
+                node = Accessible.span [] [ Accessible.text "inline" ]
+            in
+            Expect.pass
+        , test "a creates anchor" <| \_ ->
+            let
+                node = Accessible.a [] [ Accessible.text "link" ]
+            in
+            Expect.pass
+        , test "code creates code element" <| \_ ->
+            let
+                node = Accessible.code [] [ Accessible.text "x = 1" ]
+            in
+            Expect.pass
+        , test "em creates emphasis" <| \_ ->
+            let
+                node = Accessible.em [] [ Accessible.text "emphasis" ]
+            in
+            Expect.pass
+        , test "strong creates strong text" <| \_ ->
+            let
+                node = Accessible.strong [] [ Accessible.text "important" ]
+            in
+            Expect.pass
+        , test "i creates italic text" <| \_ ->
+            let
+                node = Accessible.i [] [ Accessible.text "italic" ]
+            in
+            Expect.pass
+        , test "b creates bold text" <| \_ ->
+            let
+                node = Accessible.b [] [ Accessible.text "bold" ]
+            in
+            Expect.pass
+        , test "u creates underline" <| \_ ->
+            let
+                node = Accessible.u [] [ Accessible.text "underline" ]
+            in
+            Expect.pass
+        , test "sub creates subscript" <| \_ ->
+            let
+                node = Accessible.sub [] [ Accessible.text "2" ]
+            in
+            Expect.pass
+        , test "sup creates superscript" <| \_ ->
+            let
+                node = Accessible.sup [] [ Accessible.text "2" ]
+            in
+            Expect.pass
+        , test "br creates line break" <| \_ ->
+            let
+                node = Accessible.br []
+            in
+            Expect.pass
+        , test "small creates small text" <| \_ ->
+            let
+                node = Accessible.small [] [ Accessible.text "fine print" ]
+            in
+            Expect.pass
+        , test "cite creates citation" <| \_ ->
+            let
+                node = Accessible.cite [] [ Accessible.text "source" ]
+            in
+            Expect.pass
+        , test "dfn creates definition" <| \_ ->
+            let
+                node = Accessible.dfn [] [ Accessible.text "term" ]
+            in
+            Expect.pass
+        , test "abbr creates abbreviation" <| \_ ->
+            let
+                node = Accessible.abbr [] [ Accessible.text "HTML" ]
+            in
+            Expect.pass
+        , test "time creates time element" <| \_ ->
+            let
+                node = Accessible.time [] [ Accessible.text "2024" ]
+            in
+            Expect.pass
+        , test "var creates variable" <| \_ ->
+            let
+                node = Accessible.var [] [ Accessible.text "x" ]
+            in
+            Expect.pass
+        , test "samp creates sample output" <| \_ ->
+            let
+                node = Accessible.samp [] [ Accessible.text "output" ]
+            in
+            Expect.pass
+        , test "kbd creates keyboard input" <| \_ ->
+            let
+                node = Accessible.kbd [] [ Accessible.text "Ctrl" ]
+            in
+            Expect.pass
+        , test "s creates strikethrough" <| \_ ->
+            let
+                node = Accessible.s [] [ Accessible.text "old" ]
+            in
+            Expect.pass
+        , test "q creates inline quote" <| \_ ->
+            let
+                node = Accessible.q [] [ Accessible.text "quoted" ]
+            in
+            Expect.pass
+        , test "mark creates highlight" <| \_ ->
+            let
+                node = Accessible.mark [] [ Accessible.text "marked" ]
+            in
+            Expect.pass
+        , test "ruby creates annotation" <| \_ ->
+            let
+                node = Accessible.ruby [] [ Accessible.text "text" ]
+            in
+            Expect.pass
+        , test "rt creates ruby text" <| \_ ->
+            let
+                node = Accessible.rt [] [ Accessible.text "annotation" ]
+            in
+            Expect.pass
+        , test "rp creates ruby paren" <| \_ ->
+            let
+                node = Accessible.rp [] [ Accessible.text "(" ]
+            in
+            Expect.pass
+        , test "bdi creates bidi isolation" <| \_ ->
+            let
+                node = Accessible.bdi [] [ Accessible.text "text" ]
+            in
+            Expect.pass
+        , test "bdo creates bidi override" <| \_ ->
+            let
+                node = Accessible.bdo [] [ Accessible.text "text" ]
+            in
+            Expect.pass
+        , test "wbr creates word break" <| \_ ->
+            let
+                node = Accessible.wbr [] [ Accessible.text "" ]
+            in
+            Expect.pass
+        ]
+
+
+listTests : Test
+listTests =
+    describe "lists"
+        [ test "ol creates ordered list" <| \_ ->
+            let
+                node = Accessible.ol [] [ Accessible.li [] [ Accessible.text "item" ] ]
+            in
+            Expect.pass
+        , test "ul creates unordered list" <| \_ ->
+            let
+                node = Accessible.ul [] [ Accessible.li [] [ Accessible.text "item" ] ]
+            in
+            Expect.pass
+        , test "dl creates definition list" <| \_ ->
+            let
+                node = Accessible.dl [] [ Accessible.dt [] [ Accessible.text "term" ] ]
+            in
+            Expect.pass
+        , test "dd creates definition description" <| \_ ->
+            let
+                node = Accessible.dd [] [ Accessible.text "definition" ]
+            in
+            Expect.pass
+        ]
+
+
+sectionTests : Test
+sectionTests =
+    describe "sections"
+        [ test "section creates section" <| \_ ->
+            let
+                node = Accessible.section [] [ Accessible.text "content" ]
+            in
+            Expect.pass
+        , test "nav creates navigation" <| \_ ->
+            let
+                node = Accessible.nav [] [ Accessible.text "nav" ]
+            in
+            Expect.pass
+        , test "article creates article" <| \_ ->
+            let
+                node = Accessible.article [] [ Accessible.text "article" ]
+            in
+            Expect.pass
+        , test "aside creates aside" <| \_ ->
+            let
+                node = Accessible.aside [] [ Accessible.text "aside" ]
+            in
+            Expect.pass
+        , test "header creates header" <| \_ ->
+            let
+                node = Accessible.header [] [ Accessible.text "header" ]
+            in
+            Expect.pass
+        , test "footer creates footer" <| \_ ->
+            let
+                node = Accessible.footer [] [ Accessible.text "footer" ]
+            in
+            Expect.pass
+        , test "address creates address" <| \_ ->
+            let
+                node = Accessible.address [] [ Accessible.text "addr" ]
+            in
+            Expect.pass
+        , test "main_ creates main" <| \_ ->
+            let
+                node = Accessible.main_ [] [ Accessible.text "main" ]
+            in
+            Expect.pass
+        ]
+
+
+tableTests : Test
+tableTests =
+    describe "tables"
+        [ test "table creates table" <| \_ ->
+            let
+                node = Accessible.table [] []
+            in
+            Expect.pass
+        , test "caption creates caption" <| \_ ->
+            let
+                node = Accessible.caption [] [ Accessible.text "title" ]
+            in
+            Expect.pass
+        , test "thead creates table head" <| \_ ->
+            let
+                node = Accessible.thead [] []
+            in
+            Expect.pass
+        , test "tbody creates table body" <| \_ ->
+            let
+                node = Accessible.tbody [] []
+            in
+            Expect.pass
+        , test "tfoot creates table foot" <| \_ ->
+            let
+                node = Accessible.tfoot [] []
+            in
+            Expect.pass
+        , test "tr creates table row" <| \_ ->
+            let
+                node = Accessible.tr [] []
+            in
+            Expect.pass
+        , test "td creates table cell" <| \_ ->
+            let
+                node = Accessible.td [] [ Accessible.text "data" ]
+            in
+            Expect.pass
+        , test "th creates table header" <| \_ ->
+            let
+                node = Accessible.th [] [ Accessible.text "header" ]
+            in
+            Expect.pass
+        , test "colgroup creates column group" <| \_ ->
+            let
+                node = Accessible.colgroup [] []
+            in
+            Expect.pass
+        , test "col creates column" <| \_ ->
+            let
+                node = Accessible.col [] []
+            in
+            Expect.pass
+        ]
+
+
+formTests : Test
+formTests =
+    describe "forms"
+        [ test "form creates non-interactive form" <| \_ ->
+            let
+                node = Accessible.form [] []
+            in
+            Expect.pass
+        , test "formWithListeners creates interactive form" <| \_ ->
+            let
+                node = Accessible.formWithListeners [] []
+            in
+            Expect.pass
+        , test "fieldset creates fieldset" <| \_ ->
+            let
+                node = Accessible.fieldset [] []
+            in
+            Expect.pass
+        , test "legend creates legend" <| \_ ->
+            let
+                node = Accessible.legend [] [ Accessible.text "legend" ]
+            in
+            Expect.pass
+        , test "label creates label" <| \_ ->
+            let
+                node = Accessible.label [] [ Accessible.text "label" ]
+            in
+            Expect.pass
+        , test "datalist creates datalist" <| \_ ->
+            let
+                node = Accessible.datalist [] []
+            in
+            Expect.pass
+        , test "optgroup creates option group" <| \_ ->
+            let
+                node = Accessible.optgroup [] []
+            in
+            Expect.pass
+        , test "option creates option" <| \_ ->
+            let
+                node = Accessible.option [] [ Accessible.text "opt" ]
+            in
+            Expect.pass
+        , test "output creates output" <| \_ ->
+            let
+                node = Accessible.output [] [ Accessible.text "result" ]
+            in
+            Expect.pass
+        , test "progress creates progress" <| \_ ->
+            let
+                node = Accessible.progress [] []
+            in
+            Expect.pass
+        , test "meter creates meter" <| \_ ->
+            let
+                node = Accessible.meter [] []
+            in
+            Expect.pass
+        , test "figcaption creates figcaption" <| \_ ->
+            let
+                node = Accessible.figcaption [] [ Accessible.text "caption" ]
+            in
+            Expect.pass
+        ]
+
+
+mediaTests : Test
+mediaTests =
+    describe "media"
+        [ test "audio creates audio" <| \_ ->
+            let
+                node = Accessible.audio [] []
+            in
+            Expect.pass
+        , test "video creates video" <| \_ ->
+            let
+                node = Accessible.video [] []
+            in
+            Expect.pass
+        , test "source creates source" <| \_ ->
+            let
+                node = Accessible.source [] []
+            in
+            Expect.pass
+        , test "track creates track" <| \_ ->
+            let
+                node = Accessible.track [] []
+            in
+            Expect.pass
+        , test "iframe creates iframe" <| \_ ->
+            let
+                node = Accessible.iframe [] []
+            in
+            Expect.pass
+        , test "canvas creates canvas" <| \_ ->
+            let
+                node = Accessible.canvas [] []
+            in
+            Expect.pass
+        , test "math creates math" <| \_ ->
+            let
+                node = Accessible.math [] []
+            in
+            Expect.pass
+        ]
+
+
+embeddedTests : Test
+embeddedTests =
+    describe "embedded objects"
+        [ test "embed creates embed" <| \_ ->
+            let
+                node = Accessible.embed [] []
+            in
+            Expect.pass
+        , test "object creates object" <| \_ ->
+            let
+                node = Accessible.object [] []
+            in
+            Expect.pass
+        , test "param creates param" <| \_ ->
+            let
+                node = Accessible.param [] []
+            in
+            Expect.pass
+        ]
+
+
+editTests : Test
+editTests =
+    describe "text edits"
+        [ test "ins creates insertion" <| \_ ->
+            let
+                node = Accessible.ins [] [ Accessible.text "new" ]
+            in
+            Expect.pass
+        , test "del creates deletion" <| \_ ->
+            let
+                node = Accessible.del [] [ Accessible.text "old" ]
+            in
+            Expect.pass
+        ]
+
+
+interactiveTests : Test
+interactiveTests =
+    describe "interactive elements"
+        [ test "details creates details" <| \_ ->
+            let
+                node = Accessible.details [] [ Accessible.text "details" ]
+            in
+            Expect.pass
+        , test "summary creates summary" <| \_ ->
+            let
+                node = Accessible.summary [] [ Accessible.text "summary" ]
+            in
+            Expect.pass
+        , test "menuitem creates menuitem" <| \_ ->
+            let
+                node = Accessible.menuitem [] [ Accessible.text "item" ]
+            in
+            Expect.pass
+        , test "menu creates menu" <| \_ ->
+            let
+                node = Accessible.menu [] [ Accessible.text "menu" ]
+            in
+            Expect.pass
+        ]
+
+
+imageTests : Test
+imageTests =
+    describe "images"
+        [ test "img requires alt text" <| \_ ->
+            let
+                node = Accessible.img "A photo" []
+            in
+            Expect.pass
+        , test "decorativeImg adds presentation role" <| \_ ->
+            let
+                node = Accessible.decorativeImg []
+            in
+            Expect.pass
+        , test "figure creates figure" <| \_ ->
+            let
+                node = Accessible.figure [] [ Accessible.text "fig" ]
+            in
+            Expect.pass
+        ]
+
+
+inputTests : Test
+inputTests =
+    describe "inputs"
+        [ test "inputText creates text input" <| \_ ->
+            let
+                node = Accessible.inputText "hello" []
+            in
+            Expect.pass
+        , test "inputNumber creates number input" <| \_ ->
+            let
+                node = Accessible.inputNumber "42" []
+            in
+            Expect.pass
+        , test "radio creates radio button" <| \_ ->
+            let
+                node = Accessible.radio "group" "val" True []
+            in
+            Expect.pass
+        , test "checkbox creates checkbox with checked state" <| \_ ->
+            let
+                node = Accessible.checkbox "val" (Just True) []
+            in
+            Expect.pass
+        , test "checkbox creates indeterminate checkbox" <| \_ ->
+            let
+                node = Accessible.checkbox "val" Nothing []
+            in
+            Expect.pass
+        , test "textarea creates textarea" <| \_ ->
+            let
+                node = Accessible.textarea [] [ Accessible.text "content" ]
+            in
+            Expect.pass
+        , test "select creates select" <| \_ ->
+            let
+                node = Accessible.select [] []
+            in
+            Expect.pass
+        ]
+
+
+buttonTests : Test
+buttonTests =
+    describe "button"
+        [ test "button creates button element" <| \_ ->
+            let
+                node = Accessible.button [] [ Accessible.text "Click" ]
+            in
+            Expect.pass
+        ]
+
+
+labelTests : Test
+labelTests =
+    describe "labels"
+        [ test "labelBefore wraps label before input" <| \_ ->
+            let
+                node =
+                    Accessible.labelBefore []
+                        (Accessible.text "Email")
+                        (Accessible.inputText "test@example.com" [])
+            in
+            Expect.pass
+        , test "labelAfter wraps label after input" <| \_ ->
+            let
+                node =
+                    Accessible.labelAfter []
+                        (Accessible.text "I agree")
+                        (Accessible.checkbox "agree" (Just False) [])
+            in
+            Expect.pass
+        , test "labelHidden creates hidden label" <| \_ ->
+            let
+                node =
+                    Accessible.labelHidden "Search"
+                        []
+                        (Accessible.text "Search")
+                        (Accessible.inputText "" [])
+            in
+            Expect.pass
+        ]
+
+
+tabTests : Test
+tabTests =
+    describe "tabs"
+        [ test "tabList creates tablist container" <| \_ ->
+            let
+                node = Accessible.tabList [] []
+            in
+            Expect.pass
+        , test "tab creates tab element" <| \_ ->
+            let
+                node = Accessible.tab [] [ Accessible.text "Tab 1" ]
+            in
+            Expect.pass
+        , test "tabPanel creates tab panel" <| \_ ->
+            let
+                node = Accessible.tabPanel [] [ Accessible.text "Content" ]
+            in
+            Expect.pass
+        ]

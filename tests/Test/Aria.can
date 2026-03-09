@@ -1,0 +1,444 @@
+module Test.Aria exposing (main)
+
+import Accessible.Aria as Aria
+import Test exposing (Test, describe, test)
+import Expect
+
+
+main : Test
+main =
+    describe "Accessible.Aria"
+        [ labelingTests
+        , relationshipTests
+        , stateTests
+        , validationTests
+        , currentTests
+        , rangeTests
+        , orientationTests
+        , tableTests
+        , setTests
+        , levelTests
+        , autoCompleteTests
+        , popupTests
+        , sortTests
+        , miscTests
+        ]
+
+
+labelingTests : Test
+labelingTests =
+    describe "labeling"
+        [ test "label creates aria-label" <| \_ ->
+            let
+                attr = Aria.label "Close dialog"
+            in
+            Expect.pass
+        , test "labelledBy creates aria-labelledby" <| \_ ->
+            let
+                attr = Aria.labelledBy "title-id"
+            in
+            Expect.pass
+        , test "labeledBy is alias for labelledBy" <| \_ ->
+            let
+                attr = Aria.labeledBy "title-id"
+            in
+            Expect.pass
+        , test "describedBy joins IDs with space" <| \_ ->
+            let
+                attr = Aria.describedBy [ "desc1", "desc2" ]
+            in
+            Expect.pass
+        , test "details creates aria-details" <| \_ ->
+            let
+                attr = Aria.details "details-id"
+            in
+            Expect.pass
+        , test "roleDescription creates aria-roledescription" <| \_ ->
+            let
+                attr = Aria.roleDescription "slide"
+            in
+            Expect.pass
+        , test "brailleLabel creates aria-braillelabel" <| \_ ->
+            let
+                attr = Aria.brailleLabel "Close"
+            in
+            Expect.pass
+        ]
+
+
+relationshipTests : Test
+relationshipTests =
+    describe "relationships"
+        [ test "controls joins IDs" <| \_ ->
+            let
+                attr = Aria.controls [ "panel1", "panel2" ]
+            in
+            Expect.pass
+        , test "owns joins IDs" <| \_ ->
+            let
+                attr = Aria.owns [ "child1", "child2" ]
+            in
+            Expect.pass
+        , test "activeDescendant creates attribute" <| \_ ->
+            let
+                attr = Aria.activeDescendant "item-3"
+            in
+            Expect.pass
+        , test "flowTo joins IDs" <| \_ ->
+            let
+                attr = Aria.flowTo [ "next1", "next2" ]
+            in
+            Expect.pass
+        , test "errorMessage creates attribute" <| \_ ->
+            let
+                attr = Aria.errorMessage "err-msg"
+            in
+            Expect.pass
+        ]
+
+
+stateTests : Test
+stateTests =
+    describe "state"
+        [ test "expanded true" <| \_ ->
+            let
+                attr = Aria.expanded True
+            in
+            Expect.pass
+        , test "expanded false" <| \_ ->
+            let
+                attr = Aria.expanded False
+            in
+            Expect.pass
+        , test "hidden true" <| \_ ->
+            let
+                attr = Aria.hidden True
+            in
+            Expect.pass
+        , test "disabled true" <| \_ ->
+            let
+                attr = Aria.disabled True
+            in
+            Expect.pass
+        , test "readOnly true" <| \_ ->
+            let
+                attr = Aria.readOnly True
+            in
+            Expect.pass
+        , test "required true" <| \_ ->
+            let
+                attr = Aria.required True
+            in
+            Expect.pass
+        , test "selected true" <| \_ ->
+            let
+                attr = Aria.selected True
+            in
+            Expect.pass
+        , test "pressed Just True" <| \_ ->
+            let
+                attr = Aria.pressed (Just True)
+            in
+            Expect.pass
+        , test "pressed Nothing is mixed" <| \_ ->
+            let
+                attr = Aria.pressed Nothing
+            in
+            Expect.pass
+        , test "checked Just True" <| \_ ->
+            let
+                attr = Aria.checked (Just True)
+            in
+            Expect.pass
+        , test "checked Nothing is mixed" <| \_ ->
+            let
+                attr = Aria.checked Nothing
+            in
+            Expect.pass
+        , test "indeterminate creates mixed" <| \_ ->
+            let
+                attr = Aria.indeterminate
+            in
+            Expect.pass
+        , test "modal true" <| \_ ->
+            let
+                attr = Aria.modal True
+            in
+            Expect.pass
+        , test "multiLine true" <| \_ ->
+            let
+                attr = Aria.multiLine True
+            in
+            Expect.pass
+        , test "multiSelectable true" <| \_ ->
+            let
+                attr = Aria.multiSelectable True
+            in
+            Expect.pass
+        ]
+
+
+validationTests : Test
+validationTests =
+    describe "validation"
+        [ test "invalid true" <| \_ ->
+            let
+                attr = Aria.invalid True
+            in
+            Expect.pass
+        , test "invalid false" <| \_ ->
+            let
+                attr = Aria.invalid False
+            in
+            Expect.pass
+        , test "invalidGrammar" <| \_ ->
+            let
+                attr = Aria.invalidGrammar
+            in
+            Expect.pass
+        , test "invalidSpelling" <| \_ ->
+            let
+                attr = Aria.invalidSpelling
+            in
+            Expect.pass
+        ]
+
+
+currentTests : Test
+currentTests =
+    describe "current state"
+        [ test "currentItem true" <| \_ ->
+            let
+                attr = Aria.currentItem True
+            in
+            Expect.pass
+        , test "currentPage" <| \_ ->
+            let
+                attr = Aria.currentPage
+            in
+            Expect.pass
+        , test "currentStep" <| \_ ->
+            let
+                attr = Aria.currentStep
+            in
+            Expect.pass
+        , test "currentLocation" <| \_ ->
+            let
+                attr = Aria.currentLocation
+            in
+            Expect.pass
+        , test "currentDate" <| \_ ->
+            let
+                attr = Aria.currentDate
+            in
+            Expect.pass
+        , test "currentTime" <| \_ ->
+            let
+                attr = Aria.currentTime
+            in
+            Expect.pass
+        ]
+
+
+rangeTests : Test
+rangeTests =
+    describe "range values"
+        [ test "valueMin" <| \_ ->
+            let
+                attr = Aria.valueMin 0.0
+            in
+            Expect.pass
+        , test "valueMax" <| \_ ->
+            let
+                attr = Aria.valueMax 100.0
+            in
+            Expect.pass
+        , test "valueNow" <| \_ ->
+            let
+                attr = Aria.valueNow 50.0
+            in
+            Expect.pass
+        , test "valueText" <| \_ ->
+            let
+                attr = Aria.valueText "50%"
+            in
+            Expect.pass
+        ]
+
+
+orientationTests : Test
+orientationTests =
+    describe "orientation"
+        [ test "orientationHorizontal" <| \_ ->
+            let
+                attr = Aria.orientationHorizontal
+            in
+            Expect.pass
+        , test "orientationVertical" <| \_ ->
+            let
+                attr = Aria.orientationVertical
+            in
+            Expect.pass
+        ]
+
+
+tableTests : Test
+tableTests =
+    describe "table properties"
+        [ test "colCount" <| \_ ->
+            let
+                attr = Aria.colCount 5
+            in
+            Expect.pass
+        , test "colIndex" <| \_ ->
+            let
+                attr = Aria.colIndex 2
+            in
+            Expect.pass
+        , test "colSpan" <| \_ ->
+            let
+                attr = Aria.colSpan 3
+            in
+            Expect.pass
+        , test "rowCount" <| \_ ->
+            let
+                attr = Aria.rowCount 10
+            in
+            Expect.pass
+        , test "rowIndex" <| \_ ->
+            let
+                attr = Aria.rowIndex 1
+            in
+            Expect.pass
+        , test "rowSpan" <| \_ ->
+            let
+                attr = Aria.rowSpan 2
+            in
+            Expect.pass
+        ]
+
+
+setTests : Test
+setTests =
+    describe "set properties"
+        [ test "setSize" <| \_ ->
+            let
+                attr = Aria.setSize 5
+            in
+            Expect.pass
+        , test "posInSet" <| \_ ->
+            let
+                attr = Aria.posInSet 3
+            in
+            Expect.pass
+        ]
+
+
+levelTests : Test
+levelTests =
+    describe "level"
+        [ test "level sets aria-level" <| \_ ->
+            let
+                attr = Aria.level 2
+            in
+            Expect.pass
+        ]
+
+
+autoCompleteTests : Test
+autoCompleteTests =
+    describe "autocomplete"
+        [ test "autoCompleteInline" <| \_ ->
+            let
+                attr = Aria.autoCompleteInline
+            in
+            Expect.pass
+        , test "autoCompleteList" <| \_ ->
+            let
+                attr = Aria.autoCompleteList
+            in
+            Expect.pass
+        , test "autoCompleteBoth" <| \_ ->
+            let
+                attr = Aria.autoCompleteBoth
+            in
+            Expect.pass
+        ]
+
+
+popupTests : Test
+popupTests =
+    describe "popups"
+        [ test "hasMenuPopUp" <| \_ ->
+            let
+                attr = Aria.hasMenuPopUp
+            in
+            Expect.pass
+        , test "hasListBoxPopUp" <| \_ ->
+            let
+                attr = Aria.hasListBoxPopUp
+            in
+            Expect.pass
+        , test "hasTreePopUp" <| \_ ->
+            let
+                attr = Aria.hasTreePopUp
+            in
+            Expect.pass
+        , test "hasGridPopUp" <| \_ ->
+            let
+                attr = Aria.hasGridPopUp
+            in
+            Expect.pass
+        , test "hasDialogPopUp" <| \_ ->
+            let
+                attr = Aria.hasDialogPopUp
+            in
+            Expect.pass
+        ]
+
+
+sortTests : Test
+sortTests =
+    describe "sorting"
+        [ test "sortAscending" <| \_ ->
+            let
+                attr = Aria.sortAscending
+            in
+            Expect.pass
+        , test "sortDescending" <| \_ ->
+            let
+                attr = Aria.sortDescending
+            in
+            Expect.pass
+        , test "sortCustom" <| \_ ->
+            let
+                attr = Aria.sortCustom
+            in
+            Expect.pass
+        , test "sortNone" <| \_ ->
+            let
+                attr = Aria.sortNone
+            in
+            Expect.pass
+        ]
+
+
+miscTests : Test
+miscTests =
+    describe "misc"
+        [ test "keyShortcuts" <| \_ ->
+            let
+                attr = Aria.keyShortcuts [ "Alt+S" ]
+            in
+            Expect.pass
+        , test "placeholder" <| \_ ->
+            let
+                attr = Aria.placeholder "Enter text..."
+            in
+            Expect.pass
+        , test "longDescription" <| \_ ->
+            let
+                attr = Aria.longDescription "A long description"
+            in
+            Expect.pass
+        ]

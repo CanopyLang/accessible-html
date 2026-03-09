@@ -1,0 +1,213 @@
+module Test.Role exposing (main)
+
+import Accessible.Role as Role exposing (Role(..))
+import Test exposing (Test, describe, test)
+import Expect
+
+
+main : Test
+main =
+    describe "Accessible.Role"
+        [ roleToStringTests
+        , convenienceTests
+        ]
+
+
+roleToStringTests : Test
+roleToStringTests =
+    describe "roleToString"
+        [ test "Alert" <| \_ ->
+            Expect.equal (Role.roleToString Alert) "alert"
+        , test "AlertDialog" <| \_ ->
+            Expect.equal (Role.roleToString AlertDialog) "alertdialog"
+        , test "Button" <| \_ ->
+            Expect.equal (Role.roleToString Button) "button"
+        , test "CheckBox" <| \_ ->
+            Expect.equal (Role.roleToString CheckBox) "checkbox"
+        , test "ComboBox" <| \_ ->
+            Expect.equal (Role.roleToString ComboBox) "combobox"
+        , test "Dialog" <| \_ ->
+            Expect.equal (Role.roleToString Dialog) "dialog"
+        , test "GridCell" <| \_ ->
+            Expect.equal (Role.roleToString GridCell) "gridcell"
+        , test "Link" <| \_ ->
+            Expect.equal (Role.roleToString Link) "link"
+        , test "Log" <| \_ ->
+            Expect.equal (Role.roleToString Log) "log"
+        , test "Marquee" <| \_ ->
+            Expect.equal (Role.roleToString Marquee) "marquee"
+        , test "Menu" <| \_ ->
+            Expect.equal (Role.roleToString Menu) "menu"
+        , test "MenuBar" <| \_ ->
+            Expect.equal (Role.roleToString MenuBar) "menubar"
+        , test "MenuItem" <| \_ ->
+            Expect.equal (Role.roleToString MenuItem) "menuitem"
+        , test "MenuItemCheckBox" <| \_ ->
+            Expect.equal (Role.roleToString MenuItemCheckBox) "menuitemcheckbox"
+        , test "MenuItemRadio" <| \_ ->
+            Expect.equal (Role.roleToString MenuItemRadio) "menuitemradio"
+        , test "Option" <| \_ ->
+            Expect.equal (Role.roleToString Option) "option"
+        , test "ProgressBar" <| \_ ->
+            Expect.equal (Role.roleToString ProgressBar) "progressbar"
+        , test "Radio" <| \_ ->
+            Expect.equal (Role.roleToString Radio) "radio"
+        , test "RadioGroup" <| \_ ->
+            Expect.equal (Role.roleToString RadioGroup) "radiogroup"
+        , test "ScrollBar" <| \_ ->
+            Expect.equal (Role.roleToString ScrollBar) "scrollbar"
+        , test "Separator" <| \_ ->
+            Expect.equal (Role.roleToString Separator) "separator"
+        , test "Slider" <| \_ ->
+            Expect.equal (Role.roleToString Slider) "slider"
+        , test "SpinButton" <| \_ ->
+            Expect.equal (Role.roleToString SpinButton) "spinbutton"
+        , test "Status" <| \_ ->
+            Expect.equal (Role.roleToString Status) "status"
+        , test "Switch" <| \_ ->
+            Expect.equal (Role.roleToString Switch) "switch"
+        , test "Tab" <| \_ ->
+            Expect.equal (Role.roleToString Tab) "tab"
+        , test "TabList" <| \_ ->
+            Expect.equal (Role.roleToString TabList) "tablist"
+        , test "TabPanel" <| \_ ->
+            Expect.equal (Role.roleToString TabPanel) "tabpanel"
+        , test "TextBox" <| \_ ->
+            Expect.equal (Role.roleToString TextBox) "textbox"
+        , test "Timer" <| \_ ->
+            Expect.equal (Role.roleToString Timer) "timer"
+        , test "ToolBar" <| \_ ->
+            Expect.equal (Role.roleToString ToolBar) "toolbar"
+        , test "ToolTip" <| \_ ->
+            Expect.equal (Role.roleToString ToolTip) "tooltip"
+        , test "Tree" <| \_ ->
+            Expect.equal (Role.roleToString Tree) "tree"
+        , test "TreeGrid" <| \_ ->
+            Expect.equal (Role.roleToString TreeGrid) "treegrid"
+        , test "TreeItem" <| \_ ->
+            Expect.equal (Role.roleToString TreeItem) "treeitem"
+        , test "Application" <| \_ ->
+            Expect.equal (Role.roleToString Application) "application"
+        , test "Article" <| \_ ->
+            Expect.equal (Role.roleToString Article) "article"
+        , test "Code" <| \_ ->
+            Expect.equal (Role.roleToString Code) "code"
+        , test "ColumnHeader" <| \_ ->
+            Expect.equal (Role.roleToString ColumnHeader) "columnheader"
+        , test "Definition" <| \_ ->
+            Expect.equal (Role.roleToString Definition) "definition"
+        , test "Directory" <| \_ ->
+            Expect.equal (Role.roleToString Directory) "directory"
+        , test "Document" <| \_ ->
+            Expect.equal (Role.roleToString Document) "document"
+        , test "Feed" <| \_ ->
+            Expect.equal (Role.roleToString Feed) "feed"
+        , test "Figure" <| \_ ->
+            Expect.equal (Role.roleToString Figure) "figure"
+        , test "Grid" <| \_ ->
+            Expect.equal (Role.roleToString Grid) "grid"
+        , test "Group" <| \_ ->
+            Expect.equal (Role.roleToString Group) "group"
+        , test "Heading" <| \_ ->
+            Expect.equal (Role.roleToString Heading) "heading"
+        , test "Img" <| \_ ->
+            Expect.equal (Role.roleToString Img) "img"
+        , test "List" <| \_ ->
+            Expect.equal (Role.roleToString List) "list"
+        , test "ListBox" <| \_ ->
+            Expect.equal (Role.roleToString ListBox) "listbox"
+        , test "ListItem" <| \_ ->
+            Expect.equal (Role.roleToString ListItem) "listitem"
+        , test "Math" <| \_ ->
+            Expect.equal (Role.roleToString Math) "math"
+        , test "Meter" <| \_ ->
+            Expect.equal (Role.roleToString Meter) "meter"
+        , test "None" <| \_ ->
+            Expect.equal (Role.roleToString None) "none"
+        , test "Note" <| \_ ->
+            Expect.equal (Role.roleToString Note) "note"
+        , test "Presentation" <| \_ ->
+            Expect.equal (Role.roleToString Presentation) "presentation"
+        , test "Row" <| \_ ->
+            Expect.equal (Role.roleToString Row) "row"
+        , test "RowGroup" <| \_ ->
+            Expect.equal (Role.roleToString RowGroup) "rowgroup"
+        , test "RowHeader" <| \_ ->
+            Expect.equal (Role.roleToString RowHeader) "rowheader"
+        , test "Table" <| \_ ->
+            Expect.equal (Role.roleToString Table) "table"
+        , test "Term" <| \_ ->
+            Expect.equal (Role.roleToString Term) "term"
+        , test "Time" <| \_ ->
+            Expect.equal (Role.roleToString Time) "time"
+        , test "Banner" <| \_ ->
+            Expect.equal (Role.roleToString Banner) "banner"
+        , test "Complementary" <| \_ ->
+            Expect.equal (Role.roleToString Complementary) "complementary"
+        , test "ContentInfo" <| \_ ->
+            Expect.equal (Role.roleToString ContentInfo) "contentinfo"
+        , test "Form" <| \_ ->
+            Expect.equal (Role.roleToString Form) "form"
+        , test "Main" <| \_ ->
+            Expect.equal (Role.roleToString Main) "main"
+        , test "Navigation" <| \_ ->
+            Expect.equal (Role.roleToString Navigation) "navigation"
+        , test "Region" <| \_ ->
+            Expect.equal (Role.roleToString Region) "region"
+        , test "Search" <| \_ ->
+            Expect.equal (Role.roleToString Search) "search"
+        , test "Comment" <| \_ ->
+            Expect.equal (Role.roleToString Comment) "comment"
+        , test "Deletion" <| \_ ->
+            Expect.equal (Role.roleToString Deletion) "deletion"
+        , test "Emphasis" <| \_ ->
+            Expect.equal (Role.roleToString Emphasis) "emphasis"
+        , test "Insertion" <| \_ ->
+            Expect.equal (Role.roleToString Insertion) "insertion"
+        , test "Mark" <| \_ ->
+            Expect.equal (Role.roleToString Mark) "mark"
+        , test "Strong" <| \_ ->
+            Expect.equal (Role.roleToString Strong) "strong"
+        , test "Subscript" <| \_ ->
+            Expect.equal (Role.roleToString Subscript) "subscript"
+        , test "Suggestion" <| \_ ->
+            Expect.equal (Role.roleToString Suggestion) "suggestion"
+        , test "Superscript" <| \_ ->
+            Expect.equal (Role.roleToString Superscript) "superscript"
+        ]
+
+
+convenienceTests : Test
+convenienceTests =
+    describe "convenience functions"
+        [ test "alert returns attribute" <| \_ ->
+            let
+                attr = Role.alert
+            in
+            Expect.pass
+        , test "dialog returns attribute" <| \_ ->
+            let
+                attr = Role.dialog
+            in
+            Expect.pass
+        , test "role Navigation returns attribute" <| \_ ->
+            let
+                attr = Role.role Navigation
+            in
+            Expect.pass
+        , test "custom creates custom role" <| \_ ->
+            let
+                attr = Role.custom "my-custom-role"
+            in
+            Expect.pass
+        , test "button returns attribute" <| \_ ->
+            let
+                attr = Role.button
+            in
+            Expect.pass
+        , test "tabList returns attribute" <| \_ ->
+            let
+                attr = Role.tabList
+            in
+            Expect.pass
+        ]

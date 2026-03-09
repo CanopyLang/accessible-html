@@ -1,0 +1,106 @@
+module Accessible.Live exposing
+    ( polite, assertive, off
+    , livePolite, liveAssertive
+    , atomic, busy
+    , relevantAdditions, relevantAdditionsText, relevantAll
+    , relevantRemovals, relevantText
+    )
+
+{-| Live region attributes for dynamic content announcements.
+
+Live regions tell assistive technologies to monitor an area of the page
+for changes and announce those changes to the user. This is essential
+for things like chat messages, notifications, and form validation errors.
+
+# Live Modes
+@docs polite, assertive, off
+@docs livePolite, liveAssertive
+
+# Live Region Properties
+@docs atomic, busy
+@docs relevantAdditions, relevantAdditionsText, relevantAll
+@docs relevantRemovals, relevantText
+-}
+
+import Html
+import VirtualDom
+
+
+{-| Set aria-live="polite". Announce updates when the user is idle. -}
+polite : Html.Attribute msg
+polite =
+    VirtualDom.attribute "aria-live" "polite"
+
+
+{-| Set aria-live="assertive". Announce updates immediately, interrupting. -}
+assertive : Html.Attribute msg
+assertive =
+    VirtualDom.attribute "aria-live" "assertive"
+
+
+{-| Set aria-live="off". Do not announce updates. -}
+off : Html.Attribute msg
+off =
+    VirtualDom.attribute "aria-live" "off"
+
+
+{-| Alias for polite. -}
+livePolite : Html.Attribute msg
+livePolite =
+    polite
+
+
+{-| Alias for assertive. -}
+liveAssertive : Html.Attribute msg
+liveAssertive =
+    assertive
+
+
+{-| Set aria-atomic. Whether the entire region should be announced on change. -}
+atomic : Bool -> Html.Attribute msg
+atomic val =
+    VirtualDom.attribute "aria-atomic" (boolToString val)
+
+
+{-| Set aria-busy. Whether the region is being updated. -}
+busy : Bool -> Html.Attribute msg
+busy val =
+    VirtualDom.attribute "aria-busy" (boolToString val)
+
+
+{-| Set aria-relevant="additions". -}
+relevantAdditions : Html.Attribute msg
+relevantAdditions =
+    VirtualDom.attribute "aria-relevant" "additions"
+
+
+{-| Set aria-relevant="additions text". -}
+relevantAdditionsText : Html.Attribute msg
+relevantAdditionsText =
+    VirtualDom.attribute "aria-relevant" "additions text"
+
+
+{-| Set aria-relevant="all". -}
+relevantAll : Html.Attribute msg
+relevantAll =
+    VirtualDom.attribute "aria-relevant" "all"
+
+
+{-| Set aria-relevant="removals". -}
+relevantRemovals : Html.Attribute msg
+relevantRemovals =
+    VirtualDom.attribute "aria-relevant" "removals"
+
+
+{-| Set aria-relevant="text". -}
+relevantText : Html.Attribute msg
+relevantText =
+    VirtualDom.attribute "aria-relevant" "text"
+
+
+-- HELPERS
+
+
+boolToString : Bool -> String
+boolToString val =
+    if val then "true" else "false"

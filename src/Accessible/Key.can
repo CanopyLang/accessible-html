@@ -1,0 +1,237 @@
+module Accessible.Key exposing
+    ( Event
+    , tabbable
+    , onKeyDown, onKeyDownPreventDefault
+    , onKeyUp, onKeyUpPreventDefault
+    , tab, tabBack, enter, space, escape
+    , up, down, left, right
+    , shiftUp, shiftDown, shiftLeft, shiftRight
+    , shift
+    , customOneOf
+    )
+
+{-| Keyboard event helpers for accessible interactive widgets.
+
+Provides typed key bindings that map specific keys (with optional modifiers)
+to messages. Commonly used for implementing keyboard navigation patterns
+required by WAI-ARIA: arrow key navigation in menus, Enter/Space for
+activation, Escape for dismissal, and Tab for focus management.
+
+# Types
+@docs Event
+
+# Tab Index
+@docs tabbable
+
+# Key Down
+@docs onKeyDown, onKeyDownPreventDefault
+
+# Key Up
+@docs onKeyUp, onKeyUpPreventDefault
+
+# Common Keys
+@docs tab, tabBack, enter, space, escape
+@docs up, down, left, right
+
+# Shift + Arrow
+@docs shiftUp, shiftDown, shiftLeft, shiftRight
+
+# Modifier Keys
+@docs shift
+
+# Advanced
+@docs customOneOf
+-}
+
+import Html
+import Json.Decode as Decode
+import VirtualDom
+
+
+{-| A keyboard event binding. Maps a specific key (with optional modifiers)
+to a message.
+-}
+type alias Event msg =
+    { keyCode : Int
+    , shiftKey : Bool
+    , msg : msg
+    }
+
+
+{-| Set the tabindex. When True, the element is focusable via tab (tabindex=0).
+When False, the element is removed from the tab order (tabindex=-1) but can
+still be focused programmatically.
+-}
+tabbable : Bool -> Html.Attribute msg
+tabbable val =
+    if val then
+        VirtualDom.attribute "tabIndex" "0"
+    else
+        VirtualDom.attribute "tabIndex" "-1"
+
+
+{-| Listen for keydown events and dispatch messages based on key bindings.
+
+    div
+        [ Accessible.Key.onKeyDown
+            [ Accessible.Key.enter Submit
+            , Accessible.Key.escape Cancel
+            ]
+        ]
+        [ ... ]
+-}
+onKeyDown : List (Event msg) -> Html.Attribute msg
+onKeyDown events =
+    VirtualDom.on "keydown" (VirtualDom.Normal (customOneOf events))
+
+
+{-| Like onKeyDown but calls preventDefault on matching keys. Useful for
+preventing the default browser behavior (e.g., preventing Space from
+scrolling the page when activating a custom button).
+-}
+onKeyDownPreventDefault : List (Event msg) -> Html.Attribute msg
+onKeyDownPreventDefault events =
+    VirtualDom.on "keydown"
+        (VirtualDom.MayPreventDefault
+            (Decode.map alwaysPreventDefault (customOneOf events))
+        )
+
+
+{-| Listen for keyup events and dispatch messages based on key bindings. -}
+onKeyUp : List (Event msg) -> Html.Attribute msg
+onKeyUp events =
+    VirtualDom.on "keyup" (VirtualDom.Normal (customOneOf events))
+
+
+{-| Like onKeyUp but calls preventDefault on matching keys. -}
+onKeyUpPreventDefault : List (Event msg) -> Html.Attribute msg
+onKeyUpPreventDefault events =
+    VirtualDom.on "keyup"
+        (VirtualDom.MayPreventDefault
+            (Decode.map alwaysPreventDefault (customOneOf events))
+        )
+
+
+{-| Bind a message to the Tab key. -}
+tab : msg -> Event msg
+tab msg =
+    { keyCode = 9, shiftKey = False, msg = msg }
+
+
+{-| Bind a message to Shift+Tab. -}
+tabBack : msg -> Event msg
+tabBack msg =
+    { keyCode = 9, shiftKey = True, msg = msg }
+
+
+{-| Bind a message to the Enter key. -}
+enter : msg -> Event msg
+enter msg =
+    { keyCode = 13, shiftKey = False, msg = msg }
+
+
+{-| Bind a message to the Space key. -}
+space : msg -> Event msg
+space msg =
+    { keyCode = 32, shiftKey = False, msg = msg }
+
+
+{-| Bind a message to the Escape key. -}
+escape : msg -> Event msg
+escape msg =
+    { keyCode = 27, shiftKey = False, msg = msg }
+
+
+{-| Bind a message to the Up arrow key. -}
+up : msg -> Event msg
+up msg =
+    { keyCode = 38, shiftKey = False, msg = msg }
+
+
+{-| Bind a message to the Down arrow key. -}
+down : msg -> Event msg
+down msg =
+    { keyCode = 40, shiftKey = False, msg = msg }
+
+
+{-| Bind a message to the Left arrow key. -}
+left : msg -> Event msg
+left msg =
+    { keyCode = 37, shiftKey = False, msg = msg }
+
+
+{-| Bind a message to the Right arrow key. -}
+right : msg -> Event msg
+right msg =
+    { keyCode = 39, shiftKey = False, msg = msg }
+
+
+{-| Bind a message to Shift + Up. -}
+shiftUp : msg -> Event msg
+shiftUp msg =
+    { keyCode = 38, shiftKey = True, msg = msg }
+
+
+{-| Bind a message to Shift + Down. -}
+shiftDown : msg -> Event msg
+shiftDown msg =
+    { keyCode = 40, shiftKey = True, msg = msg }
+
+
+{-| Bind a message to Shift + Left. -}
+shiftLeft : msg -> Event msg
+shiftLeft msg =
+    { keyCode = 37, shiftKey = True, msg = msg }
+
+
+{-| Bind a message to Shift + Right. -}
+shiftRight : msg -> Event msg
+shiftRight msg =
+    { keyCode = 39, shiftKey = True, msg = msg }
+
+
+{-| Bind a message to the Shift key alone (keyCode 16). -}
+shift : msg -> Event msg
+shift msg =
+    { keyCode = 16, shiftKey = True, msg = msg }
+
+
+{-| Build a custom JSON decoder from a list of key events. For advanced use
+with Html.Events.on. Tries each key binding in order and succeeds with the
+first match.
+-}
+customOneOf : List (Event msg) -> Decode.Decoder msg
+customOneOf events =
+    Decode.map2 (\kc sk -> matchEvent events kc sk) decodeKeyCode decodeShiftKey
+        |> Decode.andThen identity
+
+
+-- HELPERS
+
+
+matchEvent : List (Event msg) -> Int -> Bool -> Decode.Decoder msg
+matchEvent events keyCodeVal shiftKeyVal =
+    case events of
+        [] ->
+            Decode.fail "No matching key binding"
+
+        event :: rest ->
+            if event.keyCode == keyCodeVal && event.shiftKey == shiftKeyVal then
+                Decode.succeed event.msg
+            else
+                matchEvent rest keyCodeVal shiftKeyVal
+
+
+decodeKeyCode : Decode.Decoder Int
+decodeKeyCode =
+    Decode.field "keyCode" Decode.int
+
+
+decodeShiftKey : Decode.Decoder Bool
+decodeShiftKey =
+    Decode.field "shiftKey" Decode.bool
+
+
+alwaysPreventDefault : msg -> ( msg, Bool )
+alwaysPreventDefault msg =
+    ( msg, True )

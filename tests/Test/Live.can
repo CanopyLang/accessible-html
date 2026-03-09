@@ -1,0 +1,81 @@
+module Test.Live exposing (main)
+
+import Accessible.Live as Live
+import Test exposing (Test, describe, test)
+import Expect
+
+
+main : Test
+main =
+    describe "Accessible.Live"
+        [ test "polite creates aria-live polite" <| \_ ->
+            let
+                attr = Live.polite
+            in
+            Expect.pass
+        , test "assertive creates aria-live assertive" <| \_ ->
+            let
+                attr = Live.assertive
+            in
+            Expect.pass
+        , test "off creates aria-live off" <| \_ ->
+            let
+                attr = Live.off
+            in
+            Expect.pass
+        , test "livePolite is alias for polite" <| \_ ->
+            let
+                attr = Live.livePolite
+            in
+            Expect.pass
+        , test "liveAssertive is alias for assertive" <| \_ ->
+            let
+                attr = Live.liveAssertive
+            in
+            Expect.pass
+        , test "atomic true" <| \_ ->
+            let
+                attr = Live.atomic True
+            in
+            Expect.pass
+        , test "atomic false" <| \_ ->
+            let
+                attr = Live.atomic False
+            in
+            Expect.pass
+        , test "busy true" <| \_ ->
+            let
+                attr = Live.busy True
+            in
+            Expect.pass
+        , test "busy false" <| \_ ->
+            let
+                attr = Live.busy False
+            in
+            Expect.pass
+        , test "relevantAdditions" <| \_ ->
+            let
+                attr = Live.relevantAdditions
+            in
+            Expect.pass
+        , test "relevantAdditionsText" <| \_ ->
+            let
+                attr = Live.relevantAdditionsText
+            in
+            Expect.pass
+        , test "relevantAll" <| \_ ->
+            let
+                attr = Live.relevantAll
+            in
+            Expect.pass
+        , test "relevantRemovals" <| \_ ->
+            let
+                attr = Live.relevantRemovals
+            in
+            Expect.pass
+        , test "relevantText" <| \_ ->
+            let
+                attr = Live.relevantText
+            in
+            Expect.pass
+        ]

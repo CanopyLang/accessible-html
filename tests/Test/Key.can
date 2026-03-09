@@ -1,0 +1,192 @@
+module Test.Key exposing (main)
+
+import Accessible.Key as Key
+import Test exposing (Test, describe, test)
+import Expect
+
+
+main : Test
+main =
+    describe "Accessible.Key"
+        [ keyBindingTests
+        , tabbableTests
+        , eventHandlerTests
+        ]
+
+
+keyBindingTests : Test
+keyBindingTests =
+    describe "key bindings"
+        [ test "enter has keyCode 13" <| \_ ->
+            let
+                event = Key.enter "msg"
+            in
+            Expect.equal event.keyCode 13
+        , test "enter has shiftKey False" <| \_ ->
+            let
+                event = Key.enter "msg"
+            in
+            Expect.equal event.shiftKey False
+        , test "space has keyCode 32" <| \_ ->
+            let
+                event = Key.space "msg"
+            in
+            Expect.equal event.keyCode 32
+        , test "escape has keyCode 27" <| \_ ->
+            let
+                event = Key.escape "msg"
+            in
+            Expect.equal event.keyCode 27
+        , test "tab has keyCode 9" <| \_ ->
+            let
+                event = Key.tab "msg"
+            in
+            Expect.equal event.keyCode 9
+        , test "tab has shiftKey False" <| \_ ->
+            let
+                event = Key.tab "msg"
+            in
+            Expect.equal event.shiftKey False
+        , test "tabBack has keyCode 9" <| \_ ->
+            let
+                event = Key.tabBack "msg"
+            in
+            Expect.equal event.keyCode 9
+        , test "tabBack has shiftKey True" <| \_ ->
+            let
+                event = Key.tabBack "msg"
+            in
+            Expect.equal event.shiftKey True
+        , test "up has keyCode 38" <| \_ ->
+            let
+                event = Key.up "msg"
+            in
+            Expect.equal event.keyCode 38
+        , test "down has keyCode 40" <| \_ ->
+            let
+                event = Key.down "msg"
+            in
+            Expect.equal event.keyCode 40
+        , test "left has keyCode 37" <| \_ ->
+            let
+                event = Key.left "msg"
+            in
+            Expect.equal event.keyCode 37
+        , test "right has keyCode 39" <| \_ ->
+            let
+                event = Key.right "msg"
+            in
+            Expect.equal event.keyCode 39
+        , test "shiftUp has shiftKey True" <| \_ ->
+            let
+                event = Key.shiftUp "msg"
+            in
+            Expect.equal event.shiftKey True
+        , test "shiftUp has keyCode 38" <| \_ ->
+            let
+                event = Key.shiftUp "msg"
+            in
+            Expect.equal event.keyCode 38
+        , test "shiftDown has shiftKey True" <| \_ ->
+            let
+                event = Key.shiftDown "msg"
+            in
+            Expect.equal event.shiftKey True
+        , test "shiftDown has keyCode 40" <| \_ ->
+            let
+                event = Key.shiftDown "msg"
+            in
+            Expect.equal event.keyCode 40
+        , test "shiftLeft has shiftKey True" <| \_ ->
+            let
+                event = Key.shiftLeft "msg"
+            in
+            Expect.equal event.shiftKey True
+        , test "shiftLeft has keyCode 37" <| \_ ->
+            let
+                event = Key.shiftLeft "msg"
+            in
+            Expect.equal event.keyCode 37
+        , test "shiftRight has shiftKey True" <| \_ ->
+            let
+                event = Key.shiftRight "msg"
+            in
+            Expect.equal event.shiftKey True
+        , test "shiftRight has keyCode 39" <| \_ ->
+            let
+                event = Key.shiftRight "msg"
+            in
+            Expect.equal event.keyCode 39
+        , test "shift has keyCode 16" <| \_ ->
+            let
+                event = Key.shift "msg"
+            in
+            Expect.equal event.keyCode 16
+        , test "shift has shiftKey True" <| \_ ->
+            let
+                event = Key.shift "msg"
+            in
+            Expect.equal event.shiftKey True
+        , test "enter stores msg" <| \_ ->
+            let
+                event = Key.enter "hello"
+            in
+            Expect.equal event.msg "hello"
+        , test "space stores msg" <| \_ ->
+            let
+                event = Key.space "world"
+            in
+            Expect.equal event.msg "world"
+        ]
+
+
+tabbableTests : Test
+tabbableTests =
+    describe "tabbable"
+        [ test "tabbable True creates attribute" <| \_ ->
+            let
+                attr = Key.tabbable True
+            in
+            Expect.pass
+        , test "tabbable False creates attribute" <| \_ ->
+            let
+                attr = Key.tabbable False
+            in
+            Expect.pass
+        ]
+
+
+eventHandlerTests : Test
+eventHandlerTests =
+    describe "event handlers"
+        [ test "onKeyDown creates attribute" <| \_ ->
+            let
+                attr = Key.onKeyDown [ Key.enter "submit" ]
+            in
+            Expect.pass
+        , test "onKeyDownPreventDefault creates attribute" <| \_ ->
+            let
+                attr = Key.onKeyDownPreventDefault [ Key.space "activate" ]
+            in
+            Expect.pass
+        , test "onKeyUp creates attribute" <| \_ ->
+            let
+                attr = Key.onKeyUp [ Key.escape "cancel" ]
+            in
+            Expect.pass
+        , test "onKeyUpPreventDefault creates attribute" <| \_ ->
+            let
+                attr = Key.onKeyUpPreventDefault [ Key.tab "next" ]
+            in
+            Expect.pass
+        , test "onKeyDown with multiple bindings" <| \_ ->
+            let
+                attr = Key.onKeyDown
+                    [ Key.enter "submit"
+                    , Key.escape "cancel"
+                    , Key.up "prev"
+                    , Key.down "next"
+                    ]
+            in
+            Expect.pass
+        ]

@@ -1,0 +1,524 @@
+module Accessible.Aria exposing
+    ( label, labelledBy, labeledBy, describedBy, details, roleDescription
+    , brailleLabel
+    , controls, owns, activeDescendant, flowTo, errorMessage
+    , expanded, hidden, disabled, readOnly, required, selected
+    , pressed, checked, indeterminate
+    , modal, multiLine, multiSelectable
+    , invalid, invalidGrammar, invalidSpelling
+    , currentItem, currentPage, currentStep, currentLocation, currentDate, currentTime
+    , valueMin, valueMax, valueNow, valueText
+    , orientationHorizontal, orientationVertical
+    , colCount, colIndex, colSpan, rowCount, rowIndex, rowSpan
+    , setSize, posInSet
+    , level
+    , autoCompleteInline, autoCompleteList, autoCompleteBoth
+    , hasMenuPopUp, hasListBoxPopUp, hasTreePopUp, hasGridPopUp, hasDialogPopUp
+    , sortAscending, sortDescending, sortCustom, sortNone
+    , keyShortcuts
+    , placeholder
+    , longDescription
+    )
+
+{-| All ARIA states and properties as typed attributes.
+
+# Labeling and Description
+@docs label, labelledBy, labeledBy, describedBy, details, roleDescription
+@docs brailleLabel
+
+# Relationships
+@docs controls, owns, activeDescendant, flowTo, errorMessage
+
+# State
+@docs expanded, hidden, disabled, readOnly, required, selected
+@docs pressed, checked, indeterminate
+@docs modal, multiLine, multiSelectable
+
+# Validation
+@docs invalid, invalidGrammar, invalidSpelling
+
+# Current State
+@docs currentItem, currentPage, currentStep, currentLocation, currentDate, currentTime
+
+# Range Values
+@docs valueMin, valueMax, valueNow, valueText
+
+# Orientation
+@docs orientationHorizontal, orientationVertical
+
+# Table Properties
+@docs colCount, colIndex, colSpan, rowCount, rowIndex, rowSpan
+
+# Set Properties
+@docs setSize, posInSet
+
+# Level
+@docs level
+
+# Autocomplete
+@docs autoCompleteInline, autoCompleteList, autoCompleteBoth
+
+# Popups
+@docs hasMenuPopUp, hasListBoxPopUp, hasTreePopUp, hasGridPopUp, hasDialogPopUp
+
+# Sorting
+@docs sortAscending, sortDescending, sortCustom, sortNone
+
+# Keyboard Shortcuts
+@docs keyShortcuts
+
+# Input
+@docs placeholder
+
+# Long Description
+@docs longDescription
+-}
+
+import Html
+import VirtualDom
+
+
+-- LABELING AND DESCRIPTION
+
+
+{-| Set aria-label. Provides an accessible name when visible text is insufficient. -}
+label : String -> Html.Attribute msg
+label =
+    VirtualDom.attribute "aria-label"
+
+
+{-| Set aria-labelledby. References the ID of another element that labels this one. -}
+labelledBy : String -> Html.Attribute msg
+labelledBy =
+    VirtualDom.attribute "aria-labelledby"
+
+
+{-| Alias for labelledBy (American English spelling). -}
+labeledBy : String -> Html.Attribute msg
+labeledBy =
+    labelledBy
+
+
+{-| Set aria-describedby. References IDs of elements that describe this one. -}
+describedBy : List String -> Html.Attribute msg
+describedBy ids =
+    VirtualDom.attribute "aria-describedby" (String.join " " ids)
+
+
+{-| Set aria-details. References the ID of an element providing detailed info. -}
+details : String -> Html.Attribute msg
+details =
+    VirtualDom.attribute "aria-details"
+
+
+{-| Set aria-roledescription. Human-readable description of the role. -}
+roleDescription : String -> Html.Attribute msg
+roleDescription =
+    VirtualDom.attribute "aria-roledescription"
+
+
+{-| Set aria-braillelabel. Label optimized for braille output. -}
+brailleLabel : String -> Html.Attribute msg
+brailleLabel =
+    VirtualDom.attribute "aria-braillelabel"
+
+
+-- RELATIONSHIPS
+
+
+{-| Set aria-controls. IDs of elements controlled by this element. -}
+controls : List String -> Html.Attribute msg
+controls ids =
+    VirtualDom.attribute "aria-controls" (String.join " " ids)
+
+
+{-| Set aria-owns. IDs of elements owned by this element. -}
+owns : List String -> Html.Attribute msg
+owns ids =
+    VirtualDom.attribute "aria-owns" (String.join " " ids)
+
+
+{-| Set aria-activedescendant. ID of the currently active descendant. -}
+activeDescendant : String -> Html.Attribute msg
+activeDescendant =
+    VirtualDom.attribute "aria-activedescendant"
+
+
+{-| Set aria-flowto. IDs of elements in the suggested reading order. -}
+flowTo : List String -> Html.Attribute msg
+flowTo ids =
+    VirtualDom.attribute "aria-flowto" (String.join " " ids)
+
+
+{-| Set aria-errormessage. ID of the element containing the error message. -}
+errorMessage : String -> Html.Attribute msg
+errorMessage =
+    VirtualDom.attribute "aria-errormessage"
+
+
+-- STATE
+
+
+{-| Set aria-expanded. Whether a collapsible section is expanded. -}
+expanded : Bool -> Html.Attribute msg
+expanded val =
+    VirtualDom.attribute "aria-expanded" (boolToString val)
+
+
+{-| Set aria-hidden. Whether the element is hidden from the accessibility tree. -}
+hidden : Bool -> Html.Attribute msg
+hidden val =
+    VirtualDom.attribute "aria-hidden" (boolToString val)
+
+
+{-| Set aria-disabled. Whether the element is disabled. -}
+disabled : Bool -> Html.Attribute msg
+disabled val =
+    VirtualDom.attribute "aria-disabled" (boolToString val)
+
+
+{-| Set aria-readonly. Whether the element is read-only. -}
+readOnly : Bool -> Html.Attribute msg
+readOnly val =
+    VirtualDom.attribute "aria-readonly" (boolToString val)
+
+
+{-| Set aria-required. Whether the element is required. -}
+required : Bool -> Html.Attribute msg
+required val =
+    VirtualDom.attribute "aria-required" (boolToString val)
+
+
+{-| Set aria-selected. Whether the element is selected. -}
+selected : Bool -> Html.Attribute msg
+selected val =
+    VirtualDom.attribute "aria-selected" (boolToString val)
+
+
+{-| Set aria-pressed. Tri-state: Just True = pressed, Just False = not pressed,
+Nothing = mixed.
+-}
+pressed : Maybe Bool -> Html.Attribute msg
+pressed val =
+    VirtualDom.attribute "aria-pressed" (triStateToString val)
+
+
+{-| Set aria-checked. Tri-state: Just True = checked, Just False = unchecked,
+Nothing = mixed/indeterminate.
+-}
+checked : Maybe Bool -> Html.Attribute msg
+checked val =
+    VirtualDom.attribute "aria-checked" (triStateToString val)
+
+
+{-| Set aria-checked to "mixed", indicating an indeterminate state. -}
+indeterminate : Html.Attribute msg
+indeterminate =
+    VirtualDom.attribute "aria-checked" "mixed"
+
+
+{-| Set aria-modal. Whether the element is a modal dialog. -}
+modal : Bool -> Html.Attribute msg
+modal val =
+    VirtualDom.attribute "aria-modal" (boolToString val)
+
+
+{-| Set aria-multiline. Whether a textbox accepts multiple lines. -}
+multiLine : Bool -> Html.Attribute msg
+multiLine val =
+    VirtualDom.attribute "aria-multiline" (boolToString val)
+
+
+{-| Set aria-multiselectable. Whether multiple items can be selected. -}
+multiSelectable : Bool -> Html.Attribute msg
+multiSelectable val =
+    VirtualDom.attribute "aria-multiselectable" (boolToString val)
+
+
+-- VALIDATION
+
+
+{-| Set aria-invalid to true or false. -}
+invalid : Bool -> Html.Attribute msg
+invalid val =
+    VirtualDom.attribute "aria-invalid" (boolToString val)
+
+
+{-| Set aria-invalid="grammar". -}
+invalidGrammar : Html.Attribute msg
+invalidGrammar =
+    VirtualDom.attribute "aria-invalid" "grammar"
+
+
+{-| Set aria-invalid="spelling". -}
+invalidSpelling : Html.Attribute msg
+invalidSpelling =
+    VirtualDom.attribute "aria-invalid" "spelling"
+
+
+-- CURRENT STATE
+
+
+{-| Set aria-current to "true" or "false". -}
+currentItem : Bool -> Html.Attribute msg
+currentItem val =
+    VirtualDom.attribute "aria-current" (boolToString val)
+
+
+{-| Set aria-current="page". -}
+currentPage : Html.Attribute msg
+currentPage =
+    VirtualDom.attribute "aria-current" "page"
+
+
+{-| Set aria-current="step". -}
+currentStep : Html.Attribute msg
+currentStep =
+    VirtualDom.attribute "aria-current" "step"
+
+
+{-| Set aria-current="location". -}
+currentLocation : Html.Attribute msg
+currentLocation =
+    VirtualDom.attribute "aria-current" "location"
+
+
+{-| Set aria-current="date". -}
+currentDate : Html.Attribute msg
+currentDate =
+    VirtualDom.attribute "aria-current" "date"
+
+
+{-| Set aria-current="time". -}
+currentTime : Html.Attribute msg
+currentTime =
+    VirtualDom.attribute "aria-current" "time"
+
+
+-- RANGE VALUES
+
+
+{-| Set aria-valuemin. -}
+valueMin : Float -> Html.Attribute msg
+valueMin val =
+    VirtualDom.attribute "aria-valuemin" (String.fromFloat val)
+
+
+{-| Set aria-valuemax. -}
+valueMax : Float -> Html.Attribute msg
+valueMax val =
+    VirtualDom.attribute "aria-valuemax" (String.fromFloat val)
+
+
+{-| Set aria-valuenow. -}
+valueNow : Float -> Html.Attribute msg
+valueNow val =
+    VirtualDom.attribute "aria-valuenow" (String.fromFloat val)
+
+
+{-| Set aria-valuetext. Human-readable text alternative for the value. -}
+valueText : String -> Html.Attribute msg
+valueText =
+    VirtualDom.attribute "aria-valuetext"
+
+
+-- ORIENTATION
+
+
+{-| Set aria-orientation="horizontal". -}
+orientationHorizontal : Html.Attribute msg
+orientationHorizontal =
+    VirtualDom.attribute "aria-orientation" "horizontal"
+
+
+{-| Set aria-orientation="vertical". -}
+orientationVertical : Html.Attribute msg
+orientationVertical =
+    VirtualDom.attribute "aria-orientation" "vertical"
+
+
+-- TABLE PROPERTIES
+
+
+{-| Set aria-colcount. Total number of columns in a table. -}
+colCount : Int -> Html.Attribute msg
+colCount val =
+    VirtualDom.attribute "aria-colcount" (String.fromInt val)
+
+
+{-| Set aria-colindex. Column index of a cell. -}
+colIndex : Int -> Html.Attribute msg
+colIndex val =
+    VirtualDom.attribute "aria-colindex" (String.fromInt val)
+
+
+{-| Set aria-colspan. Number of columns spanned by a cell. -}
+colSpan : Int -> Html.Attribute msg
+colSpan val =
+    VirtualDom.attribute "aria-colspan" (String.fromInt val)
+
+
+{-| Set aria-rowcount. Total number of rows in a table. -}
+rowCount : Int -> Html.Attribute msg
+rowCount val =
+    VirtualDom.attribute "aria-rowcount" (String.fromInt val)
+
+
+{-| Set aria-rowindex. Row index of a cell. -}
+rowIndex : Int -> Html.Attribute msg
+rowIndex val =
+    VirtualDom.attribute "aria-rowindex" (String.fromInt val)
+
+
+{-| Set aria-rowspan. Number of rows spanned by a cell. -}
+rowSpan : Int -> Html.Attribute msg
+rowSpan val =
+    VirtualDom.attribute "aria-rowspan" (String.fromInt val)
+
+
+-- SET PROPERTIES
+
+
+{-| Set aria-setsize. Number of items in the current set. -}
+setSize : Int -> Html.Attribute msg
+setSize val =
+    VirtualDom.attribute "aria-setsize" (String.fromInt val)
+
+
+{-| Set aria-posinset. Position of this item in the current set. -}
+posInSet : Int -> Html.Attribute msg
+posInSet val =
+    VirtualDom.attribute "aria-posinset" (String.fromInt val)
+
+
+-- LEVEL
+
+
+{-| Set aria-level. Hierarchical level (e.g., heading level). -}
+level : Int -> Html.Attribute msg
+level val =
+    VirtualDom.attribute "aria-level" (String.fromInt val)
+
+
+-- AUTOCOMPLETE
+
+
+{-| Set aria-autocomplete="inline". -}
+autoCompleteInline : Html.Attribute msg
+autoCompleteInline =
+    VirtualDom.attribute "aria-autocomplete" "inline"
+
+
+{-| Set aria-autocomplete="list". -}
+autoCompleteList : Html.Attribute msg
+autoCompleteList =
+    VirtualDom.attribute "aria-autocomplete" "list"
+
+
+{-| Set aria-autocomplete="both". -}
+autoCompleteBoth : Html.Attribute msg
+autoCompleteBoth =
+    VirtualDom.attribute "aria-autocomplete" "both"
+
+
+-- POPUPS
+
+
+{-| Set aria-haspopup="menu". -}
+hasMenuPopUp : Html.Attribute msg
+hasMenuPopUp =
+    VirtualDom.attribute "aria-haspopup" "menu"
+
+
+{-| Set aria-haspopup="listbox". -}
+hasListBoxPopUp : Html.Attribute msg
+hasListBoxPopUp =
+    VirtualDom.attribute "aria-haspopup" "listbox"
+
+
+{-| Set aria-haspopup="tree". -}
+hasTreePopUp : Html.Attribute msg
+hasTreePopUp =
+    VirtualDom.attribute "aria-haspopup" "tree"
+
+
+{-| Set aria-haspopup="grid". -}
+hasGridPopUp : Html.Attribute msg
+hasGridPopUp =
+    VirtualDom.attribute "aria-haspopup" "grid"
+
+
+{-| Set aria-haspopup="dialog". -}
+hasDialogPopUp : Html.Attribute msg
+hasDialogPopUp =
+    VirtualDom.attribute "aria-haspopup" "dialog"
+
+
+-- SORTING
+
+
+{-| Set aria-sort="ascending". -}
+sortAscending : Html.Attribute msg
+sortAscending =
+    VirtualDom.attribute "aria-sort" "ascending"
+
+
+{-| Set aria-sort="descending". -}
+sortDescending : Html.Attribute msg
+sortDescending =
+    VirtualDom.attribute "aria-sort" "descending"
+
+
+{-| Set aria-sort="other". -}
+sortCustom : Html.Attribute msg
+sortCustom =
+    VirtualDom.attribute "aria-sort" "other"
+
+
+{-| Set aria-sort="none". -}
+sortNone : Html.Attribute msg
+sortNone =
+    VirtualDom.attribute "aria-sort" "none"
+
+
+-- KEYBOARD SHORTCUTS
+
+
+{-| Set aria-keyshortcuts. Keyboard shortcut descriptions. -}
+keyShortcuts : List String -> Html.Attribute msg
+keyShortcuts shortcuts =
+    VirtualDom.attribute "aria-keyshortcuts" (String.join " " shortcuts)
+
+
+-- INPUT
+
+
+{-| Set aria-placeholder. Placeholder text hint. -}
+placeholder : String -> Html.Attribute msg
+placeholder =
+    VirtualDom.attribute "aria-placeholder"
+
+
+-- LONG DESCRIPTION
+
+
+{-| Set aria-description. Extended description. -}
+longDescription : String -> Html.Attribute msg
+longDescription =
+    VirtualDom.attribute "aria-description"
+
+
+-- HELPERS
+
+
+boolToString : Bool -> String
+boolToString val =
+    if val then "true" else "false"
+
+
+triStateToString : Maybe Bool -> String
+triStateToString val =
+    case val of
+        Just True -> "true"
+        Just False -> "false"
+        Nothing -> "mixed"

@@ -1,0 +1,66 @@
+module Accessible.Landmark exposing
+    ( banner, complementary, contentInfo, form
+    , main_, navigation, region, search
+    )
+
+{-| Landmark role attributes for structural navigation.
+
+Landmark roles allow assistive technologies to quickly navigate between
+major sections of a page. Each landmark should be used at most once per
+page (except navigation, which may be used multiple times with distinct
+aria-labels).
+
+@docs banner, complementary, contentInfo, form
+@docs main_, navigation, region, search
+-}
+
+import Html
+import VirtualDom
+
+
+{-| Set role="banner". Typically the site header with logo and navigation. -}
+banner : Html.Attribute msg
+banner =
+    VirtualDom.attribute "role" "banner"
+
+
+{-| Set role="complementary". Supporting content for the main content. -}
+complementary : Html.Attribute msg
+complementary =
+    VirtualDom.attribute "role" "complementary"
+
+
+{-| Set role="contentinfo". Footer area with copyright, links, etc. -}
+contentInfo : Html.Attribute msg
+contentInfo =
+    VirtualDom.attribute "role" "contentinfo"
+
+
+{-| Set role="form". A region containing form controls. -}
+form : Html.Attribute msg
+form =
+    VirtualDom.attribute "role" "form"
+
+
+{-| Set role="main". The primary content of the document. -}
+main_ : Html.Attribute msg
+main_ =
+    VirtualDom.attribute "role" "main"
+
+
+{-| Set role="navigation". A section containing navigation links. -}
+navigation : Html.Attribute msg
+navigation =
+    VirtualDom.attribute "role" "navigation"
+
+
+{-| Set role="region". A generic landmark with an accessible name. -}
+region : Html.Attribute msg
+region =
+    VirtualDom.attribute "role" "region"
+
+
+{-| Set role="search". A section containing search functionality. -}
+search : Html.Attribute msg
+search =
+    VirtualDom.attribute "role" "search"

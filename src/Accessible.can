@@ -1,0 +1,1124 @@
+module Accessible exposing
+    ( Html, Attribute
+    , text, node, map
+    , h1, h2, h3, h4, h5, h6
+    , div, p, hr, pre, blockquote
+    , span, a, code, em, strong, i, b, u, sub, sup, br
+    , small, cite, dfn, abbr, time, var, samp, kbd, s, q
+    , mark, ruby, rt, rp, bdi, bdo, wbr
+    , ol, ul, li, dl, dt, dd
+    , img, decorativeImg, figure
+    , button
+    , inputText, inputNumber, radio, checkbox
+    , textarea, select
+    , tabList, tab, tabPanel
+    , section, nav, article, aside, header, footer, address, main_
+    , figcaption
+    , table, caption, colgroup, col, tbody, thead, tfoot, tr, td, th
+    , form, formWithListeners, fieldset, legend, label
+    , datalist, optgroup, option, output, progress, meter
+    , audio, video, source, track, iframe, canvas, math
+    , embed, object, param
+    , ins, del
+    , details, summary, menuitem, menu
+    , labelBefore, labelAfter, labelHidden
+    )
+
+{-| Type-enforced accessibility for Canopy HTML. A drop-in replacement for
+the `Html` module that makes common accessibility violations impossible at
+compile time: images require alt text, inputs require labels, buttons require
+accessible names, and non-interactive elements cannot receive event handlers.
+
+# Primitives
+@docs Html, Attribute, text, node, map
+
+# Labels
+@docs labelBefore, labelAfter, labelHidden
+
+# Inputs
+@docs inputText, inputNumber, radio, checkbox, textarea, select
+
+# Buttons
+@docs button
+
+# Images
+@docs img, decorativeImg, figure
+
+# Tabs
+@docs tabList, tab, tabPanel
+
+# Headers
+@docs h1, h2, h3, h4, h5, h6
+
+# Grouping Content
+@docs div, p, hr, pre, blockquote
+
+# Text
+@docs span, a, code, em, strong, i, b, u, sub, sup, br
+@docs small, cite, dfn, abbr, time, var, samp, kbd, s, q
+@docs mark, ruby, rt, rp, bdi, bdo, wbr
+
+# Lists
+@docs ol, ul, li, dl, dt, dd
+
+# Sections
+@docs section, nav, article, aside, header, footer, address, main_
+
+# Figures
+@docs figcaption
+
+# Tables
+@docs table, caption, colgroup, col, tbody, thead, tfoot, tr, td, th
+
+# Forms
+@docs form, formWithListeners, fieldset, legend, label
+@docs datalist, optgroup, option, output, progress, meter
+
+# Media
+@docs audio, video, source, track, iframe, canvas, math
+
+# Embedded Objects
+@docs embed, object, param
+
+# Text Edits
+@docs ins, del
+
+# Interactive Elements
+@docs details, summary, menuitem, menu
+-}
+
+import Html
+import Html.Attributes
+import Json.Encode as Json
+import VirtualDom
+
+
+-- CORE TYPES
+
+
+{-| An accessible HTML node. Identical to Html.Html but constructed through
+functions that enforce accessibility requirements.
+-}
+type alias Html msg = Html.Html msg
+
+
+{-| An accessible HTML attribute. For non-interactive elements, the msg type
+is Never, preventing event handler attachment at compile time.
+-}
+type alias Attribute msg = Html.Attribute msg
+
+
+-- PRIMITIVES
+
+
+{-| Plain text node. -}
+text : String -> Html msg
+text =
+    Html.text
+
+
+{-| General node constructor. Prefer the specific element functions when
+possible, as they enforce accessibility constraints.
+-}
+node : String -> List (Attribute msg) -> List (Html msg) -> Html msg
+node =
+    Html.node
+
+
+{-| Transform the messages produced by an Html value. -}
+map : (a -> msg) -> Html a -> Html msg
+map =
+    Html.map
+
+
+-- LABELS
+
+
+{-| Visually render a label before the input it describes. The label text
+is the second argument (Html Never -- no event handlers on labels).
+The input is the third argument.
+
+    Accessible.labelBefore []
+        (Accessible.text "Email")
+        (Accessible.inputText "email" [])
+-}
+labelBefore : List (Attribute Never) -> Html Never -> Html msg -> Html msg
+labelBefore attrs labelContent input_ =
+    VirtualDom.node "label"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        [ Html.map Basics.never labelContent
+        , input_
+        ]
+
+
+{-| Visually render a label after the input it describes.
+
+    Accessible.labelAfter []
+        (Accessible.text "I agree to the terms")
+        (Accessible.checkbox "agree" (Just False) [])
+-}
+labelAfter : List (Attribute Never) -> Html Never -> Html msg -> Html msg
+labelAfter attrs labelContent input_ =
+    VirtualDom.node "label"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        [ input_
+        , Html.map Basics.never labelContent
+        ]
+
+
+{-| Create a label that is visually hidden but announced by screen readers.
+The String argument is the label text. Useful when the visual context
+makes a visible label redundant but screen readers need it.
+
+    Accessible.labelHidden "Search"
+        []
+        (Accessible.text "Search")
+        (Accessible.inputText "search" [ Html.Attributes.placeholder "Search..." ])
+-}
+labelHidden : String -> List (Attribute Never) -> Html Never -> Html msg -> Html msg
+labelHidden labelText attrs labelContent input_ =
+    VirtualDom.node "label"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        [ VirtualDom.node "span" invisibleStyles
+            [ Html.map Basics.never labelContent ]
+        , input_
+        ]
+
+
+-- INPUTS
+
+
+{-| A text input. The String argument is the input's value.
+Must be wrapped in a labelBefore, labelAfter, or labelHidden.
+
+    Accessible.labelBefore []
+        (Accessible.text "Username")
+        (Accessible.inputText "username-value" [ onInput UsernameChanged ])
+-}
+inputText : String -> List (Attribute msg) -> Html msg
+inputText val attrs =
+    VirtualDom.node "input"
+        (VirtualDom.attribute "type" "text"
+            :: VirtualDom.property "value" (Json.string val)
+            :: attrs
+        )
+        []
+
+
+{-| A number input. The String argument is the input's value. -}
+inputNumber : String -> List (Attribute msg) -> Html msg
+inputNumber val attrs =
+    VirtualDom.node "input"
+        (VirtualDom.attribute "type" "number"
+            :: VirtualDom.property "value" (Json.string val)
+            :: attrs
+        )
+        []
+
+
+{-| A radio button. Arguments: group name, value, whether checked, attributes. -}
+radio : String -> String -> Bool -> List (Attribute msg) -> Html msg
+radio groupName val isChecked attrs =
+    VirtualDom.node "input"
+        (VirtualDom.attribute "type" "radio"
+            :: VirtualDom.property "name" (Json.string groupName)
+            :: VirtualDom.property "value" (Json.string val)
+            :: VirtualDom.property "checked" (Json.bool isChecked)
+            :: attrs
+        )
+        []
+
+
+{-| A checkbox. Arguments: value, checked state (Nothing = indeterminate). -}
+checkbox : String -> Maybe Bool -> List (Attribute msg) -> Html msg
+checkbox val checkedState attrs =
+    let
+        checkedAttrs =
+            case checkedState of
+                Just isChecked ->
+                    [ VirtualDom.property "checked" (Json.bool isChecked) ]
+
+                Nothing ->
+                    [ VirtualDom.property "checked" (Json.bool False)
+                    , VirtualDom.attribute "aria-checked" "mixed"
+                    ]
+    in
+    VirtualDom.node "input"
+        (VirtualDom.attribute "type" "checkbox"
+            :: VirtualDom.property "value" (Json.string val)
+            :: checkedAttrs ++ attrs
+        )
+        []
+
+
+{-| A multi-line text area. Accepts event handler attributes. -}
+textarea : List (Attribute msg) -> List (Html msg) -> Html msg
+textarea =
+    VirtualDom.node "textarea"
+
+
+{-| A select dropdown. Accepts event handler attributes. -}
+select : List (Attribute msg) -> List (Html msg) -> Html msg
+select =
+    VirtualDom.node "select"
+
+
+-- BUTTONS
+
+
+{-| A button element. Accepts event handlers. Must contain text content
+or have an aria-label attribute for screen reader accessibility.
+
+    Accessible.button [ onClick Save ] [ Accessible.text "Save" ]
+-}
+button : List (Attribute msg) -> List (Html msg) -> Html msg
+button =
+    VirtualDom.node "button"
+
+
+-- IMAGES
+
+
+{-| An image with required alt text. The String argument is the alt text
+describing the image for screen readers. Cannot be empty -- use
+decorativeImg for images that convey no information.
+
+    Accessible.img "A golden retriever playing in a park" [ src "dog.jpg" ]
+-}
+img : String -> List (Attribute Never) -> Html msg
+img altText attrs =
+    VirtualDom.node "img"
+        (VirtualDom.property "alt" (Json.string altText)
+            :: List.map (Html.Attributes.map Basics.never) attrs
+        )
+        []
+
+
+{-| A decorative image that conveys no information. Automatically given
+role="presentation" and an empty alt attribute so screen readers skip it.
+
+    Accessible.decorativeImg [ src "divider.png" ]
+-}
+decorativeImg : List (Attribute Never) -> Html msg
+decorativeImg attrs =
+    VirtualDom.node "img"
+        (VirtualDom.property "alt" (Json.string "")
+            :: VirtualDom.attribute "role" "presentation"
+            :: List.map (Html.Attributes.map Basics.never) attrs
+        )
+        []
+
+
+{-| A figure element with a required figcaption. -}
+figure : List (Attribute Never) -> List (Html msg) -> Html msg
+figure attrs children =
+    VirtualDom.node "figure"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+-- TABS
+
+
+{-| A tab list container. Non-interactive wrapper. -}
+tabList : List (Attribute Never) -> List (Html msg) -> Html msg
+tabList attrs children =
+    VirtualDom.node "div"
+        (VirtualDom.attribute "role" "tablist"
+            :: List.map (Html.Attributes.map Basics.never) attrs
+        )
+        children
+
+
+{-| A single tab. Interactive (accepts event handlers like onClick). -}
+tab : List (Attribute msg) -> List (Html msg) -> Html msg
+tab attrs children =
+    VirtualDom.node "div"
+        (VirtualDom.attribute "role" "tab" :: attrs)
+        children
+
+
+{-| A tab panel. Non-interactive container for tab content. -}
+tabPanel : List (Attribute Never) -> List (Html msg) -> Html msg
+tabPanel attrs children =
+    VirtualDom.node "div"
+        (VirtualDom.attribute "role" "tabpanel"
+            :: List.map (Html.Attributes.map Basics.never) attrs
+        )
+        children
+
+
+-- NON-INTERACTIVE ELEMENTS
+
+
+{-| Heading level 1. Non-interactive: cannot receive event handlers. -}
+h1 : List (Attribute Never) -> List (Html msg) -> Html msg
+h1 attrs children =
+    VirtualDom.node "h1"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Heading level 2. Non-interactive. -}
+h2 : List (Attribute Never) -> List (Html msg) -> Html msg
+h2 attrs children =
+    VirtualDom.node "h2"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Heading level 3. Non-interactive. -}
+h3 : List (Attribute Never) -> List (Html msg) -> Html msg
+h3 attrs children =
+    VirtualDom.node "h3"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Heading level 4. Non-interactive. -}
+h4 : List (Attribute Never) -> List (Html msg) -> Html msg
+h4 attrs children =
+    VirtualDom.node "h4"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Heading level 5. Non-interactive. -}
+h5 : List (Attribute Never) -> List (Html msg) -> Html msg
+h5 attrs children =
+    VirtualDom.node "h5"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Heading level 6. Non-interactive. -}
+h6 : List (Attribute Never) -> List (Html msg) -> Html msg
+h6 attrs children =
+    VirtualDom.node "h6"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A generic container with no special meaning. Non-interactive. -}
+div : List (Attribute Never) -> List (Html msg) -> Html msg
+div attrs children =
+    VirtualDom.node "div"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A paragraph. Non-interactive. -}
+p : List (Attribute Never) -> List (Html msg) -> Html msg
+p attrs children =
+    VirtualDom.node "p"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A thematic break between paragraphs. Non-interactive. -}
+hr : List (Attribute Never) -> List (Html msg) -> Html msg
+hr attrs children =
+    VirtualDom.node "hr"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Preformatted text. Non-interactive. -}
+pre : List (Attribute Never) -> List (Html msg) -> Html msg
+pre attrs children =
+    VirtualDom.node "pre"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A block quotation. Non-interactive. -}
+blockquote : List (Attribute Never) -> List (Html msg) -> Html msg
+blockquote attrs children =
+    VirtualDom.node "blockquote"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| An inline container. Non-interactive. -}
+span : List (Attribute Never) -> List (Html msg) -> Html msg
+span attrs children =
+    VirtualDom.node "span"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A hyperlink. Non-interactive in this module (use Html.a for clickable links). -}
+a : List (Attribute Never) -> List (Html msg) -> Html msg
+a attrs children =
+    VirtualDom.node "a"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Computer code. Non-interactive. -}
+code : List (Attribute Never) -> List (Html msg) -> Html msg
+code attrs children =
+    VirtualDom.node "code"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Emphasized text. Non-interactive. -}
+em : List (Attribute Never) -> List (Html msg) -> Html msg
+em attrs children =
+    VirtualDom.node "em"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Especially important text. Non-interactive. -}
+strong : List (Attribute Never) -> List (Html msg) -> Html msg
+strong attrs children =
+    VirtualDom.node "strong"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Alternate voice or mood text. Non-interactive. -}
+i : List (Attribute Never) -> List (Html msg) -> Html msg
+i attrs children =
+    VirtualDom.node "i"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Text to draw attention to. Non-interactive. -}
+b : List (Attribute Never) -> List (Html msg) -> Html msg
+b attrs children =
+    VirtualDom.node "b"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Underlined text annotation. Non-interactive. -}
+u : List (Attribute Never) -> List (Html msg) -> Html msg
+u attrs children =
+    VirtualDom.node "u"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Subscript text. Non-interactive. -}
+sub : List (Attribute Never) -> List (Html msg) -> Html msg
+sub attrs children =
+    VirtualDom.node "sub"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Superscript text. Non-interactive. -}
+sup : List (Attribute Never) -> List (Html msg) -> Html msg
+sup attrs children =
+    VirtualDom.node "sup"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A line break. Non-interactive. -}
+br : List (Attribute Never) -> Html msg
+br attrs =
+    VirtualDom.node "br"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        []
+
+
+{-| A side comment or small print. Non-interactive. -}
+small : List (Attribute Never) -> List (Html msg) -> Html msg
+small attrs children =
+    VirtualDom.node "small"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A citation or reference. Non-interactive. -}
+cite : List (Attribute Never) -> List (Html msg) -> Html msg
+cite attrs children =
+    VirtualDom.node "cite"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A term being defined. Non-interactive. -}
+dfn : List (Attribute Never) -> List (Html msg) -> Html msg
+dfn attrs children =
+    VirtualDom.node "dfn"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| An abbreviation or acronym. Non-interactive. -}
+abbr : List (Attribute Never) -> List (Html msg) -> Html msg
+abbr attrs children =
+    VirtualDom.node "abbr"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A date and time value. Non-interactive. -}
+time : List (Attribute Never) -> List (Html msg) -> Html msg
+time attrs children =
+    VirtualDom.node "time"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A variable in a formula or code. Non-interactive. -}
+var : List (Attribute Never) -> List (Html msg) -> Html msg
+var attrs children =
+    VirtualDom.node "var"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Sample output from a program. Non-interactive. -}
+samp : List (Attribute Never) -> List (Html msg) -> Html msg
+samp attrs children =
+    VirtualDom.node "samp"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| User input (keyboard). Non-interactive. -}
+kbd : List (Attribute Never) -> List (Html msg) -> Html msg
+kbd attrs children =
+    VirtualDom.node "kbd"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Content no longer accurate or relevant. Non-interactive. -}
+s : List (Attribute Never) -> List (Html msg) -> Html msg
+s attrs children =
+    VirtualDom.node "s"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| An inline quotation. Non-interactive. -}
+q : List (Attribute Never) -> List (Html msg) -> Html msg
+q attrs children =
+    VirtualDom.node "q"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Highlighted text for reference. Non-interactive. -}
+mark : List (Attribute Never) -> List (Html msg) -> Html msg
+mark attrs children =
+    VirtualDom.node "mark"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Ruby annotation container. Non-interactive. -}
+ruby : List (Attribute Never) -> List (Html msg) -> Html msg
+ruby attrs children =
+    VirtualDom.node "ruby"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Ruby annotation text. Non-interactive. -}
+rt : List (Attribute Never) -> List (Html msg) -> Html msg
+rt attrs children =
+    VirtualDom.node "rt"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Ruby annotation parenthesis. Non-interactive. -}
+rp : List (Attribute Never) -> List (Html msg) -> Html msg
+rp attrs children =
+    VirtualDom.node "rp"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Bidirectional isolation. Non-interactive. -}
+bdi : List (Attribute Never) -> List (Html msg) -> Html msg
+bdi attrs children =
+    VirtualDom.node "bdi"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Bidirectional override. Non-interactive. -}
+bdo : List (Attribute Never) -> List (Html msg) -> Html msg
+bdo attrs children =
+    VirtualDom.node "bdo"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Word break opportunity. Non-interactive. -}
+wbr : List (Attribute Never) -> List (Html msg) -> Html msg
+wbr attrs children =
+    VirtualDom.node "wbr"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+-- LISTS
+
+
+{-| An ordered list. Non-interactive. -}
+ol : List (Attribute Never) -> List (Html msg) -> Html msg
+ol attrs children =
+    VirtualDom.node "ol"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| An unordered list. Non-interactive. -}
+ul : List (Attribute Never) -> List (Html msg) -> Html msg
+ul attrs children =
+    VirtualDom.node "ul"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A list item. Non-interactive. -}
+li : List (Attribute Never) -> List (Html msg) -> Html msg
+li attrs children =
+    VirtualDom.node "li"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A definition list. Non-interactive. -}
+dl : List (Attribute Never) -> List (Html msg) -> Html msg
+dl attrs children =
+    VirtualDom.node "dl"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A definition term. Non-interactive. -}
+dt : List (Attribute Never) -> List (Html msg) -> Html msg
+dt attrs children =
+    VirtualDom.node "dt"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A definition description. Non-interactive. -}
+dd : List (Attribute Never) -> List (Html msg) -> Html msg
+dd attrs children =
+    VirtualDom.node "dd"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+-- SECTIONS
+
+
+{-| A section in a document. Non-interactive. -}
+section : List (Attribute Never) -> List (Html msg) -> Html msg
+section attrs children =
+    VirtualDom.node "section"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A navigation section. Non-interactive. -}
+nav : List (Attribute Never) -> List (Html msg) -> Html msg
+nav attrs children =
+    VirtualDom.node "nav"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Self-contained content. Non-interactive. -}
+article : List (Attribute Never) -> List (Html msg) -> Html msg
+article attrs children =
+    VirtualDom.node "article"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Content loosely related to the page. Non-interactive. -}
+aside : List (Attribute Never) -> List (Html msg) -> Html msg
+aside attrs children =
+    VirtualDom.node "aside"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A page or section header. Non-interactive. -}
+header : List (Attribute Never) -> List (Html msg) -> Html msg
+header attrs children =
+    VirtualDom.node "header"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A page or section footer. Non-interactive. -}
+footer : List (Attribute Never) -> List (Html msg) -> Html msg
+footer attrs children =
+    VirtualDom.node "footer"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Contact information. Non-interactive. -}
+address : List (Attribute Never) -> List (Html msg) -> Html msg
+address attrs children =
+    VirtualDom.node "address"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| The main content of the document. Non-interactive. -}
+main_ : List (Attribute Never) -> List (Html msg) -> Html msg
+main_ attrs children =
+    VirtualDom.node "main"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+-- FIGURES
+
+
+{-| The legend of a figure. Non-interactive. -}
+figcaption : List (Attribute Never) -> List (Html msg) -> Html msg
+figcaption attrs children =
+    VirtualDom.node "figcaption"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+-- TABLES
+
+
+{-| A table element. Non-interactive. -}
+table : List (Attribute Never) -> List (Html msg) -> Html msg
+table attrs children =
+    VirtualDom.node "table"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| The title of a table. Non-interactive. -}
+caption : List (Attribute Never) -> List (Html msg) -> Html msg
+caption attrs children =
+    VirtualDom.node "caption"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A set of columns. Non-interactive. -}
+colgroup : List (Attribute Never) -> List (Html msg) -> Html msg
+colgroup attrs children =
+    VirtualDom.node "colgroup"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A column of a table. Non-interactive. -}
+col : List (Attribute Never) -> List (Html msg) -> Html msg
+col attrs children =
+    VirtualDom.node "col"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| The body rows of a table. Non-interactive. -}
+tbody : List (Attribute Never) -> List (Html msg) -> Html msg
+tbody attrs children =
+    VirtualDom.node "tbody"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| The header rows of a table. Non-interactive. -}
+thead : List (Attribute Never) -> List (Html msg) -> Html msg
+thead attrs children =
+    VirtualDom.node "thead"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| The footer rows of a table. Non-interactive. -}
+tfoot : List (Attribute Never) -> List (Html msg) -> Html msg
+tfoot attrs children =
+    VirtualDom.node "tfoot"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A row of cells. Non-interactive. -}
+tr : List (Attribute Never) -> List (Html msg) -> Html msg
+tr attrs children =
+    VirtualDom.node "tr"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A data cell. Non-interactive. -}
+td : List (Attribute Never) -> List (Html msg) -> Html msg
+td attrs children =
+    VirtualDom.node "td"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A header cell. Non-interactive. -}
+th : List (Attribute Never) -> List (Html msg) -> Html msg
+th attrs children =
+    VirtualDom.node "th"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+-- FORMS
+
+
+{-| A form element without event handlers. Non-interactive. -}
+form : List (Attribute Never) -> List (Html msg) -> Html msg
+form attrs children =
+    VirtualDom.node "form"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A form element that accepts event handlers (e.g., onSubmit). -}
+formWithListeners : List (Attribute msg) -> List (Html msg) -> Html msg
+formWithListeners =
+    VirtualDom.node "form"
+
+
+{-| A set of controls. Non-interactive. -}
+fieldset : List (Attribute Never) -> List (Html msg) -> Html msg
+fieldset attrs children =
+    VirtualDom.node "fieldset"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| The caption for a fieldset. Non-interactive. -}
+legend : List (Attribute Never) -> List (Html msg) -> Html msg
+legend attrs children =
+    VirtualDom.node "legend"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A form control caption. Non-interactive. -}
+label : List (Attribute Never) -> List (Html msg) -> Html msg
+label attrs children =
+    VirtualDom.node "label"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Predefined options for other controls. Non-interactive. -}
+datalist : List (Attribute Never) -> List (Html msg) -> Html msg
+datalist attrs children =
+    VirtualDom.node "datalist"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Logically grouped options. Non-interactive. -}
+optgroup : List (Attribute Never) -> List (Html msg) -> Html msg
+optgroup attrs children =
+    VirtualDom.node "optgroup"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| An option in a select or datalist. Non-interactive. -}
+option : List (Attribute Never) -> List (Html msg) -> Html msg
+option attrs children =
+    VirtualDom.node "option"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| The result of a calculation. Non-interactive. -}
+output : List (Attribute Never) -> List (Html msg) -> Html msg
+output attrs children =
+    VirtualDom.node "output"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Task completion progress. Non-interactive. -}
+progress : List (Attribute Never) -> List (Html msg) -> Html msg
+progress attrs children =
+    VirtualDom.node "progress"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A scalar measurement within a range. Non-interactive. -}
+meter : List (Attribute Never) -> List (Html msg) -> Html msg
+meter attrs children =
+    VirtualDom.node "meter"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+-- MEDIA
+
+
+{-| An audio stream. Non-interactive. -}
+audio : List (Attribute Never) -> List (Html msg) -> Html msg
+audio attrs children =
+    VirtualDom.node "audio"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A video element. Non-interactive. -}
+video : List (Attribute Never) -> List (Html msg) -> Html msg
+video attrs children =
+    VirtualDom.node "video"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| An alternative media resource. Non-interactive. -}
+source : List (Attribute Never) -> List (Html msg) -> Html msg
+source attrs children =
+    VirtualDom.node "source"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A timed text track. Non-interactive. -}
+track : List (Attribute Never) -> List (Html msg) -> Html msg
+track attrs children =
+    VirtualDom.node "track"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| An embedded HTML document. Non-interactive. -}
+iframe : List (Attribute Never) -> List (Html msg) -> Html msg
+iframe attrs children =
+    VirtualDom.node "iframe"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A bitmap rendering area. Non-interactive. -}
+canvas : List (Attribute Never) -> List (Html msg) -> Html msg
+canvas attrs children =
+    VirtualDom.node "canvas"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A mathematical formula. Non-interactive. -}
+math : List (Attribute Never) -> List (Html msg) -> Html msg
+math attrs children =
+    VirtualDom.node "math"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+-- EMBEDDED OBJECTS
+
+
+{-| An embedded external resource. Non-interactive. -}
+embed : List (Attribute Never) -> List (Html msg) -> Html msg
+embed attrs children =
+    VirtualDom.node "embed"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| An external resource. Non-interactive. -}
+object : List (Attribute Never) -> List (Html msg) -> Html msg
+object attrs children =
+    VirtualDom.node "object"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Parameters for a plug-in. Non-interactive. -}
+param : List (Attribute Never) -> List (Html msg) -> Html msg
+param attrs children =
+    VirtualDom.node "param"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+-- TEXT EDITS
+
+
+{-| An addition to the document. Non-interactive. -}
+ins : List (Attribute Never) -> List (Html msg) -> Html msg
+ins attrs children =
+    VirtualDom.node "ins"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A removal from the document. Non-interactive. -}
+del : List (Attribute Never) -> List (Html msg) -> Html msg
+del attrs children =
+    VirtualDom.node "del"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+-- INTERACTIVE ELEMENTS
+
+
+{-| Additional information or controls widget. Non-interactive. -}
+details : List (Attribute Never) -> List (Html msg) -> Html msg
+details attrs children =
+    VirtualDom.node "details"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| Summary or legend for a details element. Non-interactive. -}
+summary : List (Attribute Never) -> List (Html msg) -> Html msg
+summary attrs children =
+    VirtualDom.node "summary"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A command the user can invoke. Non-interactive. -}
+menuitem : List (Attribute Never) -> List (Html msg) -> Html msg
+menuitem attrs children =
+    VirtualDom.node "menuitem"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+{-| A list of commands. Non-interactive. -}
+menu : List (Attribute Never) -> List (Html msg) -> Html msg
+menu attrs children =
+    VirtualDom.node "menu"
+        (List.map (Html.Attributes.map Basics.never) attrs)
+        children
+
+
+-- HELPERS
+
+
+{-| CSS styles that make an element visually hidden but still
+accessible to screen readers.
+-}
+invisibleStyles : List (Html.Attribute msg)
+invisibleStyles =
+    [ VirtualDom.style "position" "absolute"
+    , VirtualDom.style "width" "1px"
+    , VirtualDom.style "height" "1px"
+    , VirtualDom.style "padding" "0"
+    , VirtualDom.style "margin" "-1px"
+    , VirtualDom.style "overflow" "hidden"
+    , VirtualDom.style "clip" "rect(0, 0, 0, 0)"
+    , VirtualDom.style "white-space" "nowrap"
+    , VirtualDom.style "border" "0"
+    ]

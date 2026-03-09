@@ -1,0 +1,75 @@
+module Test.Focus exposing (main)
+
+import Accessible.Focus as Focus exposing (FocusTarget(..), FocusTrap)
+import Test exposing (Test, describe, test)
+import Expect
+
+
+main : Test
+main =
+    describe "Accessible.Focus"
+        [ focusTargetTests
+        , skipNavTests
+        , focusTrapTests
+        ]
+
+
+focusTargetTests : Test
+focusTargetTests =
+    describe "FocusTarget"
+        [ test "FocusById constructor" <| \_ ->
+            let
+                target = FocusById "my-id"
+            in
+            Expect.pass
+        , test "FocusFirst constructor" <| \_ ->
+            let
+                target = FocusFirst "container"
+            in
+            Expect.pass
+        , test "FocusLast constructor" <| \_ ->
+            let
+                target = FocusLast "container"
+            in
+            Expect.pass
+        ]
+
+
+skipNavTests : Test
+skipNavTests =
+    describe "skipNav"
+        [ test "creates skip nav link" <| \_ ->
+            let
+                node = Focus.skipNav "Skip to main" "main-content"
+            in
+            Expect.pass
+        , test "creates skip nav with different text" <| \_ ->
+            let
+                node = Focus.skipNav "Skip navigation" "content"
+            in
+            Expect.pass
+        ]
+
+
+focusTrapTests : Test
+focusTrapTests =
+    describe "focusTrap"
+        [ test "creates attributes with initial focus" <| \_ ->
+            let
+                attrs = Focus.focusTrap
+                    { containerId = "modal"
+                    , initialFocusId = Just "first-input"
+                    , returnFocusId = "trigger"
+                    }
+            in
+            Expect.equal (List.length attrs) 4
+        , test "creates attributes without initial focus" <| \_ ->
+            let
+                attrs = Focus.focusTrap
+                    { containerId = "modal"
+                    , initialFocusId = Nothing
+                    , returnFocusId = "trigger"
+                    }
+            in
+            Expect.equal (List.length attrs) 3
+        ]

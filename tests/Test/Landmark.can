@@ -1,0 +1,51 @@
+module Test.Landmark exposing (main)
+
+import Accessible.Landmark as Landmark
+import Test exposing (Test, describe, test)
+import Expect
+
+
+main : Test
+main =
+    describe "Accessible.Landmark"
+        [ test "banner creates role attribute" <| \_ ->
+            let
+                attr = Landmark.banner
+            in
+            Expect.pass
+        , test "complementary creates role attribute" <| \_ ->
+            let
+                attr = Landmark.complementary
+            in
+            Expect.pass
+        , test "contentInfo creates role attribute" <| \_ ->
+            let
+                attr = Landmark.contentInfo
+            in
+            Expect.pass
+        , test "form creates role attribute" <| \_ ->
+            let
+                attr = Landmark.form
+            in
+            Expect.pass
+        , test "main_ creates role attribute" <| \_ ->
+            let
+                attr = Landmark.main_
+            in
+            Expect.pass
+        , test "navigation creates role attribute" <| \_ ->
+            let
+                attr = Landmark.navigation
+            in
+            Expect.pass
+        , test "region creates role attribute" <| \_ ->
+            let
+                attr = Landmark.region
+            in
+            Expect.pass
+        , test "search creates role attribute" <| \_ ->
+            let
+                attr = Landmark.search
+            in
+            Expect.pass
+        ]
